@@ -6,6 +6,8 @@ approach everywhere.
 
 ## Architecture
 
+![Silicon Architecture](https://user-images.githubusercontent.com/4575064/34541424-2b7b6c24-f0e9-11e7-8023-abc0df48c9c4.png)
+
 ### Separation of Concerns
 
 Model-View-Controller (MVC) now is a sign of bad taste. Everybody who built more or less serious production
