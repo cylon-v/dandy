@@ -1,0 +1,38 @@
+:receive
+    .->
+        :before -> escape_params
+        :after -> add_headers
+
+        GET -> greeting
+        /sign-in ->
+            GET -> sign_in
+        /sign_up ->
+            GET -> sign_up
+
+        /auth ->
+            :before -> load_current_user
+
+            /users ->
+                GET -> list_users
+                $id ->
+                    GET => notify_admin -> load_user -> :respond <- users/show_user
+
+            /posts ->
+                GET -> list_posts
+                POST -> create_post
+
+                $id ->
+                    :before -> load_post
+
+                    GET -> show_post
+                    PATCH -> update_post -> :respond =200
+                    DELETE -> remove_post -> :respond =200
+
+                    /comments ->
+                        GET -> list_comments
+                        POST => add_comment => notify_author =* notify_subscribers -> :respond <- comment_test =201
+
+                        $comment_id ->
+                            GET -> show_comment -> :respond <- comment
+                            DELETE -> remove_comment
+:catch -> handle_errors

@@ -1,0 +1,4 @@
+:receive
+    .->
+        GET -> greeting
+:catch -> handle_errors

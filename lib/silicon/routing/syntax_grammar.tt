@@ -1,0 +1,95 @@
+grammar Syntax
+  rule sections
+    ':receive' eol node catch <Sections>
+  end
+
+  rule before
+    (indent ':before' commands eol+) 0..1 <BeforeSection>
+  end
+
+  rule after
+    (indent ':after' commands eol+) 0..1 <AfterSection>
+  end
+
+  rule catch
+    (':catch' command eol*) 0..1 <CatchSection>
+  end
+
+  rule node
+    indent route before after actions nodes <Node>
+  end
+
+  rule action
+    indent http_verb commands respond eol <Action>
+  end
+
+  rule route
+    (path / parameter) arrow eol <Route>
+  end
+
+  rule path
+    ('.' / ('/' [a-z0-9_\-]+)) 1..1 <Path>
+  end
+
+  rule http_verb
+     ('GET' / 'POST' / 'PUT' / 'PATCH' / 'DELETE') 1..1 <HttpVerb>
+  end
+
+  rule parameter
+    ('$' [a-z0-9_]+) 1..1 <Parameter>
+  end
+
+  rule command
+    (arrow [a-z0-9_]+) 1..1 <Command>
+  end
+
+  rule commands
+    command+ <Commands>
+  end
+
+  rule actions
+    action* <Actions>
+  end
+
+  rule nodes
+    node* <Nodes>
+  end
+
+  rule view
+    (back_arrow [a-z] [a-z0-9_]* ('/' [a-z0-9_]*)*) 0..1 <View>
+  end
+
+  rule respond
+    (arrow (':respond' view http_status)) 0..1 <Respond>
+  end
+
+  rule http_status
+    ('='  (
+        '100' / '101' / '102' /
+        '200' / '201' / '202' / '203' / '204' / '205' / '206' / '207' / '208' / '226' /
+        '300' / '301' / '302' / '303' / '304' / '305' / '306' / '307' / '308' /
+        '400' / '401' / '402' / '403' / '404' / '405' / '406' / '407' / '408' /
+        '409' / '410' / '411' / '412' / '413' / '414' / '415' / '416' / '417' / '418' /
+        '421' / '422' / '423' / '424' / '426' / '428' / '429' / '431' / '444' / '449' / '451' /
+        '500' / '501' / '502' / '503' / '504' / '505' / '506' / '507' / '508' /
+        '509' / '510' / '511' / '520' / '521' / '522' / '523' / '524' / '525' / '526'
+        ) 1..1) 0..1
+    <HttpStatus>
+  end
+
+  rule arrow
+    ('*>' / '=>' / '=*') 1..1 <Arrow>
+  end
+
+  rule back_arrow
+    '<*' <BackArrow>
+  end
+
+  rule eol
+    ';'+ <Eol>
+  end
+
+  rule indent
+    '^'+ <Indent>
+  end
+end

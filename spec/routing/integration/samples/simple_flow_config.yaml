@@ -1,0 +1,2 @@
+path:
+  routes: spec/routing/integration/samples/simple_flow.routes
