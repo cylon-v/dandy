@@ -97,16 +97,16 @@ for such purpose Ruby is too verbose. An example demonstrating all features:
 :catch -> handle_errors
 ```  
 
-Routes configuration by default is located in file `app.routes`. You can change it's location in `silicon.yml` file.   
+Routes configuration by default is located in file `app/app.routes`. You can change it's location in `silicon.yml` file.   
 
 #### Action path
 Routes definition has tree-like structure. There're two root entries - :receive and :catch.
 
-:receive section describes regular flow of incoming request.
+`:receive` section describes regular flow of incoming request.
 
-:catch section defines an action which calls when an error raised somewhere in the regular flow.
+`:catch` section defines an action which calls when an error raised somewhere in the regular flow.
 
-:receive section should start from `.` - root point of the routing.
+`:receive` section should start from `.` - root point of the routing.
 
 Every line of the definition is a piece of path to target action or chain.
 
@@ -118,7 +118,7 @@ Symbols `->` and `<TAB>` emulates directory structure. Configuration demonstrate
 Symbol `$` allows to receive request parameters.
  
 #### Action chaining
-As you can see, some routes references to a chain of actions, like:
+As you can see, some routes reference to a chain of actions, like:
 
 ```
     -> update_user -> notify_admin -> log_action
