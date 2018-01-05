@@ -1,0 +1,7 @@
+path:
+  dependencies:
+    - app/actions
+  views: app/views
+  routes: app/app.routes
+action:
+  async_timeout: 10 # in seconds

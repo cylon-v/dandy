@@ -1,4 +1,0 @@
-users:
-  '/':
-    get: 'item#index'
-    post: 'item#create'

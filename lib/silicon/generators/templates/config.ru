@@ -1,4 +1,8 @@
-require 'silicon'
+require 'rack'
+require './app'
 
-use Rack::Reloader
-run Silicon::App.new
+use Rack::Parser, :content_types => {
+  'application/json'  => Proc.new { |body| ::MultiJson.decode body }
+}
+
+run App.new
