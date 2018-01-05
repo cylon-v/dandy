@@ -149,7 +149,8 @@ for sending custom status and specific response body:
     POST => add_comment => ... -> :respond <- comment_plain =201
 ``` 
 
-`:respond <-` declares a view ("comment_plain") and a status `=` (201). Details about views formatting are described below.
+Expression `:respond <-` declares a view ("comment_plain") and a status `=` (201). Details about views formatting are described below.
+
 
 ### Dependency Injection
 Dependency Injection (DI) is a heart of Silicon web-application. Every Silicon action can utilize known variables/entities 
@@ -220,7 +221,110 @@ path:
   dependencies:
     - actions # default location
     - services/injectable # additional dependencies location
-``` 
+```
+
+#### Objects lifetime
+As mentioned before, dependency injection is a heart of Silicon. And as you probably noticed we register dependencies 
+for every new request. In order to avoid leaking the memory for request-specific objects Silicon uses Hypo::Scope lifetime 
+style for registered objects. Every time when request is ending the dependencies remove from the container. 
+
+BTW, using Hypo::Scope and it's `finalize` method definition you can implement 
+[Unit of Work](https://martinfowler.com/eaaCatalog/unitOfWork.html) pattern. 
+
+```ruby
+class DbSession
+  include Hypo::Scope
+  
+  def initialize
+    @transaction = Transaction.new
+  end
+
+  def finalize
+    # unexpected behavior handling is in :catch section implementation
+    @transaction.commit      
+  end
+end
+```
+
+### Views
+By default Silicon handles only JSON requests using [JBuilder](https://github.com/rails/jbuilder) engine. But you can extend a number of engines using
+method `add_view_builder` in your `app.rb`:
+
+```ruby
+class App < Silicon::App
+ def initialize
+    super
+
+    add_view_builder(MyHtmlViewBuilder, 'html')
+  end
+end
+```
+
+View templates are located in `views` directory; you can change default location in `silicon.yml`:
+```
+path:
+  views: custom/views/location
+```
+
+In view template you can use any objects registered in the container. In example, you have a chain:
+
+```
+    GET /posts/$id
+    -> load_user -> load_post -> load_comments -> :respond <- show_post
+```
+
+and it's implementation in Ruby:
+
+```ruby
+class LoadPost
+  def initialize(id)
+    @id = id
+  end
+    
+  def call
+    # Not a real ORM, just for the demo.
+    # Posts.find(id)
+  end
+    
+  def result_name
+    'post'
+  end
+end
+
+class LoadComments
+  def initialize(id)
+    @id = id
+  end
+    
+  def call
+    # Not a real ORM, just for the demo.
+    # Comments.where(post: post)
+  end
+    
+  def result_name
+    # as you probably noticed this annoying action can be replaced 
+    # with a convention in your own base class for application actions. 
+    # Also instead of this declaration you can still use default name 
+    # for actions like 'load_comments_result'.
+  
+    'comments'
+  end
+end
+```
+
+Draw the view:
+
+```ruby
+json.post do
+  json.title @post.title
+  # ...
+  
+  json.comments @comments do |comment|
+    json.message comment.message
+    # ...
+  end
+end
+```
 
 ## Installation
 
@@ -237,10 +341,9 @@ And then execute:
 Or install it yourself as:
 
     $ gem install silicon
+    
 
-## Usage
-
-TODO: Write usage instructions here
+## Getting Started
 
 ## Development
 
@@ -256,6 +359,9 @@ Usual, but always helpful steps:
 After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
 To install this gem onto your local machine, run `bundle exec rake install`. 
 To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and tags, and push the `.gem` file to [rubygems.org](https://rubygems.org).
+
+## 
+
 
 ## Contributing
 
