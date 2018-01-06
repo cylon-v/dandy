@@ -8,7 +8,7 @@ module Silicon
       end
 
       def match(path, http_method)
-        segments = path.split('/')
+        segments = path.split('/').concat(['/'])
         params = {}
         matched = nil
 

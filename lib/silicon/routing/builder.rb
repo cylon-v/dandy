@@ -1,4 +1,4 @@
-require 'silicon/routing/route'
+  require 'silicon/routing/route'
 
 module Silicon
   module Routing
@@ -14,7 +14,7 @@ module Silicon
         result = []
 
         node = sections.node
-        restore_hierarchy(node, nil,node.to_hash)
+        restore_hierarchy(node, nil, node.to_hash)
 
         @route_params.each do |route|
           if route[:actions]

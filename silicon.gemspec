@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
   spec.email         = ['vova.kalinkin@gmail.com']
 
   spec.summary       = 'Silicon is a minimalistic web API framework.'
-  spec.description   = 'The philosophy of Silicon is to provide minimum' \
+  spec.description   = 'The philosophy of Silicon is to provide minimalistic' \
                        ' middleware between your model and API client.'
 
   spec.homepage      = 'https://github.com/cylon-v/silicon'
@@ -36,6 +36,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'treetop', '~> 1.6.8'
   spec.add_dependency 'jbuilder', '~> 2.7.0'
   spec.add_dependency 'rack-parser', '~> 0.7.0'
+  spec.add_dependency 'terminal-table', '~> 1.8.0'
 
   spec.add_development_dependency 'bundler', '~> 1.15'
   spec.add_development_dependency 'rake', '~> 10.0'

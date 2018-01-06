@@ -15,6 +15,8 @@ require 'silicon/routing/routing'
 
 module Silicon
   class App
+    attr_reader :routes
+
     def initialize(container = Hypo::Container.new)
       @container = container
 
@@ -84,8 +86,8 @@ module Silicon
     end
 
     def parse_routes
-      routes = @route_parser.parse
-      @route_matcher = Routing::Matcher.new(routes)
+      @routes = @route_parser.parse
+      @route_matcher = Routing::Matcher.new(@routes)
     end
   end
 end
