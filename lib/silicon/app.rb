@@ -43,7 +43,8 @@ module Silicon
 
     def register_dependencies
       instances = {
-        config_file_path: 'silicon.yaml'
+        config_file_path: 'silicon.yml',
+        silicon_env: ENV['SILICON_ENV'] || 'development'
       }
 
       instances.keys.each do |name|

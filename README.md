@@ -347,13 +347,6 @@ Or install it yourself as:
 
 ## Development
 
-Before making any contributions please make sure you are agree:
-
-* 3 lines of code is better than 100 for the same functionality implementation, 0 lines is the best.
-* Keep initial idea as simple as it possible. Plugins for additional functionality are more preferable. 
-* Do not use comments for obvious code; if your code is not obvious then try to make it obvious - 
-extract method, variable, perform more steps to make it more clear.
-
 Usual, but always helpful steps:
  
 After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.

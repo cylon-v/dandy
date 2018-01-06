@@ -42,7 +42,8 @@ RSpec.describe Silicon::App do
 
   describe 'initialize' do
     it 'registers required dependencies' do
-      expect(@container).to receive(:register_instance).with('silicon.yaml', :config_file_path)
+      expect(@container).to receive(:register_instance).with('development', :silicon_env)
+      expect(@container).to receive(:register_instance).with('silicon.yml', :config_file_path)
 
       expect(@container).to receive(:register).with(Silicon::Config, :silicon_config).and_return(@component)
       expect(@component).to receive(:using_lifetime).with(:singleton)
