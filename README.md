@@ -5,12 +5,6 @@ from Clean Architecture principles - "web is just a delivery mechanism".
 Silicon is build on top of IoC container Hypo and forces to use dependency injection 
 approach everywhere.  
 
-## Installation
-
-```
-    $ gem install silicon
-```
-
 ## Basic Concepts
 
 1. Dependency Injection is a heart of Silicon. Atomic actions can depend on request parameters, services, repositories, output of other 
