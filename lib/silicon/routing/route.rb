@@ -18,16 +18,6 @@ module Silicon
 
         @catch = hash[:catch]
       end
-
-      def to_hash
-        {
-          http_verb: @http_verb,
-          path: @path,
-          params: @params,
-          commands: @commands.map{|c| c.name},
-          catch: @catch.name
-        }
-      end
     end
   end
 end
