@@ -115,7 +115,7 @@ or just
 ```
 
 5. Investigate example application code, it will explain most of Silicon aspects.
-6. For more details visit our [Wiki](https://github.com/cylon-v/silicon/wiki) 
+6. For more details visit our [Wiki](https://github.com/cylon-v/silicon/wiki).
 
 ## Development
 
