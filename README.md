@@ -7,7 +7,7 @@ approach everywhere.
 
 ## Basic Concepts
 
-1. Dependency Injection is a heart of Silicon. Atomic actions can depend on request parameters, services, repositories, output of other 
+1. [Dependency Injection](https://en.wikipedia.org/wiki/Dependency_injection) is a heart of Silicon. Atomic actions can depend on request parameters, services, repositories, output of other 
 actions and other stuff. You can easily inject such dependencies in your actions through a constructor. 
 Dependency Injection significantly improves development experience: isolate your components, enjoy writing unit tests.
 
@@ -80,7 +80,7 @@ end
 
 4. Silicon is a micro-framework for micro-services. It's not intended to create monolithic giants! 
 In terms of [Domain Driven Design](https://en.wikipedia.org/wiki/Domain-driven_design) 
-concepts one Silicon application should wrap only one [Bounded Context](https://en.wikipedia.org/wiki/Domain-driven_design#Bounded_context).  
+concepts one Silicon application should wrap only one [Bounded Context](https://en.wikipedia.org/wiki/Domain-driven_design#Bounded_context).
 
 ## Getting Started
 
