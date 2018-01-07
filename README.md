@@ -13,12 +13,46 @@ approach everywhere.
 
 ## Basic Concepts
 
-1. Silicon framework introduces Abstract Chain pattern as a replacement for Model-View-Controller 
-and other ancient approaches. Every request handles by a set of atomic actions.
+1. Dependency Injection is a heart of Silicon. Atomic actions can depend on request parameters, services, repositories, output of other 
+actions and other stuff. You can easily inject such dependencies in your actions through a constructor. 
+Dependency Injection significantly improves development experience: isolate your components, enjoy writing unit tests.
 
-2. Dependency Injection is a heart of Silicon. Atomic actions can depend on request parameters, output of other 
-actions, services, repositories and other stuff. You can easily inject such dependencies in your actions through
-a constructor. Dependency Injection significantly improves development experience: isolate your components, enjoy writing unit tests.
+```ruby
+class LoadPost
+  def initialize(id, post_storage)
+    @id = id
+    @storage = post_storage
+  end
+  
+  def call
+    @storage.find(@id)
+  end
+end
+```     
+
+2. Instead of boring Ruby block-style routes definition like in Rails, Sinatra and others Silicon uses its 
+own language for that. Small example:
+
+```
+:receive
+    .->
+        :before -> load_current_user          
+        /posts ->
+            $id ->
+                :before -> load_post
+                /comments ->
+                    POST -> add_comment -> notify_author -> notify_subscribers -> :respond <- comment_test =201
+:catch -> handle_errors
+```
+
+3. The combination of flexible router and dependency injection breaks existing dogmas. 
+Silicon framework introduces Abstract Chain pattern as a replacement for Model-View-Controller 
+and other ancient approaches. Every request handles by a set of atomic actions. 
+
+```
+    # POST /posts/$id/comments
+    ... -> load_post -> add_comment -> ... 
+``` 
 
 ```ruby
 class LoadPost
@@ -37,9 +71,9 @@ class LoadPost
 end
 
 class AddComment
-  def initialize(post, data, user, comment_storage)
+  def initialize(post, silicon_data, user, comment_storage)
     @post = post
-    @data = data
+    @data = silicon_data
     @user = user
     @storage = comment_storage 
   end
@@ -48,21 +82,6 @@ class AddComment
     @storage.create(post: @post, message: @data[:message], user: @user)
   end  
 end
-```     
-
-3. Instead of boring Ruby block-style routes definition like in Rails, Sinatra and others Silicon uses its 
-own language for that. Small example:
-
-```
-:receive
-    .->
-        :before -> load_current_user          
-        /posts ->
-            $id ->
-                :before -> load_post
-                /comments ->
-                    POST -> add_comment -> notify_author -> notify_subscribers -> :respond <- comment_test =201
-:catch -> handle_errors
 ```
 
 4. Silicon is a micro-framework for micro-services. It's not intended to create monolithic giants! 
