@@ -15,7 +15,7 @@
             /users ->
                 GET -> list_users
                 $id ->
-                    GET => notify_admin -> load_user -> :respond <- users/show_user
+                    GET => notify_admin -> current_user@load_user -> :respond <- users/show_user
 
             /posts ->
                 GET -> list_posts

@@ -40,7 +40,11 @@ grammar Syntax
   end
 
   rule command
-    (arrow [a-z0-9_]+) 1..1 <Command>
+    (arrow result_name [a-z0-9_]+) 1..1 <Command>
+  end
+
+  rule result_name
+    ([a-z0-9_]+ '@') 0..1 <ResultName>
   end
 
   rule commands

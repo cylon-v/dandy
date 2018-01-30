@@ -53,5 +53,17 @@ RSpec.describe Syntax::Command do
         expect(@command.parallel?).to eql(true)
       end
     end
+
+    context 'it contains a result name (result_name@command)' do
+      before :each do
+        allow(@command).to receive(:text_value).and_return('=>result_name@command_name')
+        @command.parse
+      end
+
+      it 'should parse name and result name' do
+        expect(@command.name).to eql('command_name')
+        expect(@command.result_name).to eql('result_name')
+      end
+    end
   end
 end

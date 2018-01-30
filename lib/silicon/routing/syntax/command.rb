@@ -1,13 +1,21 @@
 module Syntax
   class Command < Treetop::Runtime::SyntaxNode
-    attr_reader :name
+    attr_reader :name, :result_name
 
     def parse
       @is_async = text_value.start_with? '=*'
       @is_parallel = text_value.start_with? '=>'
       @is_sequential = text_value.start_with? '*>'
 
-      @name = text_value.sub('*>', '').sub('=*', '').sub('=>', '')
+      full_name = text_value.sub('*>', '').sub('=*', '').sub('=>', '')
+
+      if full_name.include? '@'
+        parts = full_name.split('@')
+        @result_name = parts[0]
+        @name = parts[1]
+      else
+        @name = full_name
+      end
 
       self
     end
