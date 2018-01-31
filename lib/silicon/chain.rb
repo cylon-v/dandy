@@ -11,10 +11,10 @@ module Silicon
 
     def execute
       if @catch_command.nil?
-        run_actions
+        run_commands
       else
         begin
-          run_actions
+          run_commands
         rescue Exception => error
           @container
             .register_instance(error, :silicon_error)
@@ -29,7 +29,7 @@ module Silicon
 
     private
 
-    def run_actions
+    def run_commands
       threads = []
       Thread.abort_on_exception = true
       @commands.each_with_index do |command, index|
@@ -38,11 +38,11 @@ module Silicon
           threads.each {|t| t.join}
           threads = []
 
-          run_action(command.name)
+          run_command(command)
         else
           thread = Thread.new {
             Timeout::timeout(@async_timeout) {
-              run_action(command.name)
+              run_command(command)
             }
           }
           threads << thread if command.parallel?
@@ -55,13 +55,12 @@ module Silicon
       end
     end
 
-    def run_action(name)
-      action = @container.resolve(name.to_sym)
+    def run_command(command)
+      action = @container.resolve(command.name.to_sym)
       result = action.call
-      result_name = action.respond_to?(:result_name) ? action.result_name : "#{name}_result"
 
       @container
-        .register_instance(result, result_name.to_sym)
+        .register_instance(result, command.result_name.to_sym)
         .using_lifetime(:scope)
         .bound_to(:silicon_request)
     end

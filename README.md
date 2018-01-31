@@ -30,7 +30,7 @@ own language for that. Small example:
 ```
 :receive
     .->
-        :before -> load_current_user          
+        :before -> user@load_current_user          
         /posts ->
             $id ->
                 :before -> load_post

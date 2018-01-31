@@ -13,16 +13,19 @@ RSpec.describe Silicon::Chain do
 
       @command1 = double(:command1)
       allow(@command1).to receive(:name).and_return('command1')
+      allow(@command1).to receive(:result_name).and_return('command1_result')
       allow(@command1).to receive(:call).and_return('command1 result')
       allow(@container).to receive(:resolve).with(:command1).and_return(@command1)
 
       @command2 = double(:command2)
       allow(@command2).to receive(:name).and_return('command2')
+      allow(@command2).to receive(:result_name).and_return('command2_result')
       allow(@command2).to receive(:call).and_return('command2 result')
       allow(@container).to receive(:resolve).with(:command2).and_return(@command2)
 
       @command3 = double(:command3)
       allow(@command3).to receive(:name).and_return('command3')
+      allow(@command3).to receive(:result_name).and_return('command3_result')
       allow(@command3).to receive(:call).and_return('command3 result')
       allow(@container).to receive(:resolve).with(:command3).and_return(@command3)
 

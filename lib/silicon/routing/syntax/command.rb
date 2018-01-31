@@ -14,6 +14,7 @@ module Syntax
         @result_name = parts[0]
         @name = parts[1]
       else
+        @result_name = "#{full_name}_result"
         @name = full_name
       end
 
