@@ -20,7 +20,7 @@ grammar Syntax
   end
 
   rule action
-    indent http_verb commands 0..1 respond eol <Action>
+    indent http_verb commands respond eol <Action>
   end
 
   rule route
@@ -48,7 +48,7 @@ grammar Syntax
   end
 
   rule commands
-    command+ <Commands>
+    command* <Commands>
   end
 
   rule actions
