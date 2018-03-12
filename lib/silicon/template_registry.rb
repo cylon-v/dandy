@@ -14,8 +14,8 @@ module Silicon
       end
 
       directory = @config[:path][:views]
-      template_path = File.join(directory, name + ".#{type}")
-      match = @templates.keys.find{|k| k.include? template_path}
+      regex = /#{Regexp.escape(directory)}\/.*#{Regexp.escape(name)}\.#{Regexp.escape(type)}/
+      match = @templates.keys.find{|k| k.match(regex)}
       raise Silicon::SiliconError, "View #{name} of type #{type} not found" if match.nil?
 
       @templates[match]
