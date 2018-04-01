@@ -1,14 +1,14 @@
 require 'spec_helper'
-require 'silicon/routing/matcher'
+require 'dandy/routing/matcher'
 
-RSpec.describe Silicon::Routing::Matcher do
+RSpec.describe Dandy::Routing::Matcher do
   describe 'match' do
     context 'when there is no matching route' do
       before :all do
         routes = [
-          Silicon::Routing::Route.new(http_verb: 'GET', path: '/not-found')
+          Dandy::Routing::Route.new(http_verb: 'GET', path: '/not-found')
         ]
-        @matcher = Silicon::Routing::Matcher.new(routes)
+        @matcher = Dandy::Routing::Matcher.new(routes)
       end
 
       it 'returns nil' do
@@ -19,8 +19,8 @@ RSpec.describe Silicon::Routing::Matcher do
 
     context 'when there is matching route' do
       before :all do
-        @route = Silicon::Routing::Route.new(http_verb: 'GET', path: '/hello-world')
-        @matcher = Silicon::Routing::Matcher.new([@route])
+        @route = Dandy::Routing::Route.new(http_verb: 'GET', path: '/hello-world')
+        @matcher = Dandy::Routing::Matcher.new([@route])
       end
 
       it 'returns a match' do
@@ -31,8 +31,8 @@ RSpec.describe Silicon::Routing::Matcher do
 
     context 'when path is longer than a similar route' do
       before :all do
-        @route = Silicon::Routing::Route.new(http_verb: 'GET', path: '/hello-world')
-        @matcher = Silicon::Routing::Matcher.new([@route])
+        @route = Dandy::Routing::Route.new(http_verb: 'GET', path: '/hello-world')
+        @matcher = Dandy::Routing::Matcher.new([@route])
       end
 
       it 'returns nil' do
@@ -43,8 +43,8 @@ RSpec.describe Silicon::Routing::Matcher do
 
     context 'when there is matching route with parameters' do
       before :all do
-        @route = Silicon::Routing::Route.new(http_verb: 'DELETE', path: '/post/$id/comments/$comment_id')
-        @matcher = Silicon::Routing::Matcher.new([@route])
+        @route = Dandy::Routing::Route.new(http_verb: 'DELETE', path: '/post/$id/comments/$comment_id')
+        @matcher = Dandy::Routing::Matcher.new([@route])
       end
 
       it 'returns a match with parameters' do

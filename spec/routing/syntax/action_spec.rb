@@ -1,9 +1,9 @@
 require 'spec_helper'
-require 'silicon/routing/syntax/action'
-require 'silicon/routing/syntax/respond'
-require 'silicon/routing/syntax/commands'
-require 'silicon/routing/syntax/primitives/http_verb'
-require 'silicon/routing/syntax/view'
+require 'dandy/routing/syntax/action'
+require 'dandy/routing/syntax/respond'
+require 'dandy/routing/syntax/commands'
+require 'dandy/routing/syntax/primitives/http_verb'
+require 'dandy/routing/syntax/view'
 
 
 RSpec.describe Syntax::Action do

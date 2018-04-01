@@ -1,7 +1,7 @@
 require 'spec_helper'
-require 'silicon/routing/syntax/sections'
-require 'silicon/routing/syntax/catch_section'
-require 'silicon/routing/syntax/node'
+require 'dandy/routing/syntax/sections'
+require 'dandy/routing/syntax/catch_section'
+require 'dandy/routing/syntax/node'
 
 
 RSpec.describe Syntax::Sections do

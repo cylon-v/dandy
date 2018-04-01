@@ -1,5 +1,5 @@
 require 'spec_helper'
-require 'silicon/routing/syntax/nodes'
+require 'dandy/routing/syntax/nodes'
 
 RSpec.describe Syntax::Nodes do
   describe 'parse' do

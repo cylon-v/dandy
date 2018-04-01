@@ -1,5 +1,5 @@
 require 'spec_helper'
-require 'silicon/routing/syntax/actions'
+require 'dandy/routing/syntax/actions'
 
 RSpec.describe Syntax::Actions do
   describe 'parse' do

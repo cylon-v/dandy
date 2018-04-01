@@ -1,5 +1,5 @@
 require 'spec_helper'
-require 'silicon/routing/syntax/tree_section'
+require 'dandy/routing/syntax/tree_section'
 
 RSpec.describe Syntax::TreeSection do
   describe 'parse' do

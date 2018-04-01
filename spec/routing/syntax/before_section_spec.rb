@@ -1,6 +1,6 @@
 require 'spec_helper'
-require 'silicon/routing/syntax/before_section'
-require 'silicon/routing/syntax/commands'
+require 'dandy/routing/syntax/before_section'
+require 'dandy/routing/syntax/commands'
 
 RSpec.describe Syntax::BeforeSection do
   describe 'parse' do

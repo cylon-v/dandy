@@ -1,9 +1,9 @@
 require 'spec_helper'
-require 'silicon/loaders/dependency_loader'
-require 'silicon/chain_factory'
+require 'dandy/loaders/dependency_loader'
+require 'dandy/chain_factory'
 require 'hypo'
 
-RSpec.describe Silicon::DependencyLoader do
+RSpec.describe Dandy::DependencyLoader do
   describe 'load_components' do
     before :each do
       @container = double(:container)
@@ -24,20 +24,20 @@ RSpec.describe Silicon::DependencyLoader do
         expect(@container).to receive(:register).with(@type1)
         expect(@container).to receive(:register).with(@type2)
         expect(@container).to receive(:using_lifetime).with(:scope).twice
-        expect(@container).to receive(:bound_to).with(:silicon_request).twice
+        expect(@container).to receive(:bound_to).with(:dandy_request).twice
 
-        dependency_loader = Silicon::DependencyLoader.new(@container, @type_loader, @silicon_env)
+        dependency_loader = Dandy::DependencyLoader.new(@container, @type_loader, @dandy_env)
         dependency_loader.load_components
       end
     end
 
-    context 'when silicon_env is development' do
+    context 'when dandy_env is development' do
       before :all do
-        @silicon_env = 'development'
+        @dandy_env = 'development'
       end
 
       it 'every time loads types' do
-        dependency_loader = Silicon::DependencyLoader.new(@container, @type_loader, @silicon_env)
+        dependency_loader = Dandy::DependencyLoader.new(@container, @type_loader, @dandy_env)
         expect(@type_loader).to receive(:load_types).twice
 
         dependency_loader.load_components
@@ -45,14 +45,14 @@ RSpec.describe Silicon::DependencyLoader do
       end
     end
 
-    context 'when silicon_env is not development' do
+    context 'when dandy_env is not development' do
       before :all do
-        @silicon_env = 'production'
+        @dandy_env = 'production'
       end
 
 
       it 'skips loading types' do
-        dependency_loader = Silicon::DependencyLoader.new(@container, @type_loader, @silicon_env)
+        dependency_loader = Dandy::DependencyLoader.new(@container, @type_loader, @dandy_env)
         expect(@type_loader).not_to receive(:load_types)
 
         dependency_loader.load_components

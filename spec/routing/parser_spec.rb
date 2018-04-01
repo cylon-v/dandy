@@ -1,7 +1,7 @@
 require 'spec_helper'
-require 'silicon/routing/matcher'
+require 'dandy/routing/matcher'
 
-RSpec.describe Silicon::Routing::Parser do
+RSpec.describe Dandy::Routing::Parser do
   describe 'parse' do
     before :each do
       @file_reader = double(:file_reader)
@@ -16,7 +16,7 @@ RSpec.describe Silicon::Routing::Parser do
         allow(@syntax_parser).to receive(:parse).and_return nil
         allow(@syntax_error_interpreter).to receive(:interpret).and_return 'error message'
 
-        @parser = Silicon::Routing::Parser.new(
+        @parser = Dandy::Routing::Parser.new(
           @file_reader,
           @routes_builder,
           @syntax_parser,
@@ -25,7 +25,7 @@ RSpec.describe Silicon::Routing::Parser do
       end
 
       it 'raises syntax error with message returned from error detector' do
-        expect{@parser.parse}.to raise_error(Silicon::SyntaxError, 'error message')
+        expect{@parser.parse}.to raise_error(Dandy::SyntaxError, 'error message')
       end
     end
 
@@ -39,7 +39,7 @@ RSpec.describe Silicon::Routing::Parser do
         allow(@syntax_parser).to receive(:parse).and_return @tree
         allow(@routes_builder).to receive(:build)
 
-        @parser = Silicon::Routing::Parser.new(
+        @parser = Dandy::Routing::Parser.new(
           @file_reader,
           @routes_builder,
           @syntax_parser,

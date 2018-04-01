@@ -5,7 +5,7 @@ SimpleCov.start do
   add_filter '/spec/'
 end
 
-require 'silicon'
+require 'dandy'
 
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure

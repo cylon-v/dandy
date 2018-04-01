@@ -1,16 +1,16 @@
 require 'spec_helper'
-require 'silicon/loaders/template_loader'
+require 'dandy/loaders/template_loader'
 
-RSpec.describe Silicon::TemplateLoader do
+RSpec.describe Dandy::TemplateLoader do
   describe '[Integration] load_templates' do
     it 'loads view templates from file system' do
-      silicon_config = {
+      dandy_config = {
         path: {
-          views: ['spec/loaders/integration/samples/views']
+          views: ['spec/loaders/integration/samples/views/']
         }
       }
 
-      template_loader = Silicon::TemplateLoader.new(silicon_config)
+      template_loader = Dandy::TemplateLoader.new(dandy_config)
 
       expected = {
         'spec/loaders/integration/samples/views/test1.txt' => 'test1',

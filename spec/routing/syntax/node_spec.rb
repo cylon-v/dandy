@@ -1,11 +1,11 @@
 require 'spec_helper'
-require 'silicon/routing/syntax/route'
-require 'silicon/routing/syntax/primitives/indent'
-require 'silicon/routing/syntax/primitives/http_verb'
-require 'silicon/routing/syntax/nodes'
-require 'silicon/routing/syntax/actions'
-require 'silicon/routing/syntax/after_section'
-require 'silicon/routing/syntax/before_section'
+require 'dandy/routing/syntax/route'
+require 'dandy/routing/syntax/primitives/indent'
+require 'dandy/routing/syntax/primitives/http_verb'
+require 'dandy/routing/syntax/nodes'
+require 'dandy/routing/syntax/actions'
+require 'dandy/routing/syntax/after_section'
+require 'dandy/routing/syntax/before_section'
 
 RSpec.describe Syntax::Node do
   describe 'parse' do

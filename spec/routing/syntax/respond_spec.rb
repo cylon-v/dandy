@@ -1,7 +1,7 @@
 require 'spec_helper'
-require 'silicon/routing/syntax/sections'
-require 'silicon/routing/syntax/primitives/http_status'
-require 'silicon/routing/syntax/view'
+require 'dandy/routing/syntax/sections'
+require 'dandy/routing/syntax/primitives/http_status'
+require 'dandy/routing/syntax/view'
 
 
 RSpec.describe Syntax::Respond do

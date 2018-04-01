@@ -1,6 +1,6 @@
 require 'spec_helper'
-require 'silicon/routing/syntax/after_section'
-require 'silicon/routing/syntax/commands'
+require 'dandy/routing/syntax/after_section'
+require 'dandy/routing/syntax/commands'
 
 RSpec.describe Syntax::AfterSection do
   describe 'parse' do

@@ -1,5 +1,5 @@
 require 'spec_helper'
-require 'silicon/extensions/hash'
+require 'dandy/extensions/hash'
 
 RSpec.describe Hash do
   describe 'symbolize_keys' do

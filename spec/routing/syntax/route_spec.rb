@@ -1,7 +1,7 @@
 require 'spec_helper'
-require 'silicon/routing/syntax/route'
-require 'silicon/routing/syntax/primitives/path'
-require 'silicon/routing/syntax/primitives/parameter'
+require 'dandy/routing/syntax/route'
+require 'dandy/routing/syntax/primitives/path'
+require 'dandy/routing/syntax/primitives/parameter'
 
 
 RSpec.describe Syntax::Route do

@@ -1,12 +1,12 @@
 require 'spec_helper'
-require 'silicon/chain'
-require 'silicon/chain_factory'
+require 'dandy/chain'
+require 'dandy/chain_factory'
 require 'hypo'
 
-RSpec.describe Silicon::ChainFactory do
+RSpec.describe Dandy::ChainFactory do
   describe 'create' do
     it 'creates a chain' do
-      silicon_config = {
+      dandy_config = {
         action: {
           async_timeout: 5
         }
@@ -41,13 +41,13 @@ RSpec.describe Silicon::ChainFactory do
       allow(match).to receive(:route).and_return(route)
 
 
-      chain_factory = Silicon::ChainFactory.new(container, silicon_config)
+      chain_factory = Dandy::ChainFactory.new(container, dandy_config)
 
       expect(container).to receive(:register_instance).with('some-id', :id)
       expect(container).to receive(:register_instance).with('a name', :name)
-      expect(container).to receive(:register_instance).with(201, :silicon_status)
+      expect(container).to receive(:register_instance).with(201, :dandy_status)
 
-      expect(Silicon::Chain).to receive(:new).with(container, silicon_config, [command1, command2], catch_command)
+      expect(Dandy::Chain).to receive(:new).with(container, dandy_config, [command1, command2], catch_command)
 
       chain_factory.create(match)
     end

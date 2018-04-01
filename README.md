@@ -1,13 +1,13 @@
-# Silicon
+# Dandy
 
-Silicon is a minimalistic web API framework. Its main idea is to implement an approach 
+Dandy is a minimalistic web API framework. Its main idea is to implement an approach 
 from Clean Architecture principles - "web is just a delivery mechanism". 
-Silicon is build on top of IoC container Hypo and forces to use dependency injection 
+Dandy is build on top of IoC container Hypo and forces to use dependency injection 
 approach everywhere.  
 
 ## Basic Concepts
 
-1. [Dependency Injection](https://en.wikipedia.org/wiki/Dependency_injection) is a heart of Silicon. Atomic actions can depend on request parameters, services, repositories, output of other 
+1. [Dependency Injection](https://en.wikipedia.org/wiki/Dependency_injection) is a heart of Dandy. Atomic actions can depend on request parameters, services, repositories, output of other 
 actions and other stuff. You can easily inject such dependencies in your actions through a constructor. 
 Dependency Injection significantly improves development experience: isolate your components, enjoy writing unit tests.
 
@@ -24,7 +24,7 @@ class LoadPost
 end
 ```     
 
-2. Instead of boring Ruby block-style routes definition like in Rails, Sinatra and others Silicon uses its 
+2. Instead of boring Ruby block-style routes definition like in Rails, Sinatra and others Dandy uses its 
 own language for that. Small example:
 
 ```
@@ -40,7 +40,7 @@ own language for that. Small example:
 ```
 
 3. The combination of flexible router and dependency injection breaks existing dogmas. 
-Silicon framework introduces Abstract Chain pattern as a replacement for Model-View-Controller 
+Dandy framework introduces Abstract Chain pattern as a replacement for Model-View-Controller 
 and other ancient approaches. Every request handles by a set of atomic actions. 
 
 ```
@@ -65,9 +65,9 @@ class LoadPost
 end
 
 class AddComment
-  def initialize(post, silicon_data, user, comment_storage)
+  def initialize(post, dandy_data, user, comment_storage)
     @post = post
-    @data = silicon_data
+    @data = dandy_data
     @user = user
     @storage = comment_storage 
   end
@@ -78,25 +78,25 @@ class AddComment
 end
 ```
 
-4. Silicon is a micro-framework for micro-services. It's not intended to create monolithic giants! 
+4. Dandy is a micro-framework for micro-services. It's not intended to create monolithic giants! 
 In terms of [Domain Driven Design](https://en.wikipedia.org/wiki/Domain-driven_design) 
-concepts one Silicon application should wrap only one [Bounded Context](https://en.wikipedia.org/wiki/Domain-driven_design#Bounded_context).
+concepts one Dandy application should wrap only one [Bounded Context](https://en.wikipedia.org/wiki/Domain-driven_design#Bounded_context).
 
 ## Getting Started
 
-1. Install Silicon: 
+1. Install Dandy: 
 
 ```
-    $ gem install silicon
+    $ gem install dandy
 ```
 
-2. At the command prompt, create a new Silicon application:
+2. At the command prompt, create a new Dandy application:
 
 ```
-    $ silicon new silicon-app
+    $ dandy new dandy-app
 ```
 
-3. Go to directory `silicon-app` and start the application using a server you prefer:
+3. Go to directory `dandy-app` and start the application using a server you prefer:
 
 ```
     $ puma -p 8000 config.ru
@@ -111,11 +111,11 @@ or just
 4. Using a browser, go to http://localhost:8000 and you'll see: 
 
 ```json
-  {"message": "Welcome to silicon-app!"}
+  {"message": "Welcome to dandy-app!"}
 ```
 
-5. Investigate example application code, it will explain most of Silicon aspects.
-6. For more details visit our [Wiki](https://github.com/cylon-v/silicon/wiki).
+5. Investigate example application code, it will explain most of Dandy aspects.
+6. For more details visit our [Wiki](https://github.com/cylon-v/dandy/wiki).
 
 ## Development
 
@@ -127,7 +127,7 @@ To release a new version, update the version number in `version.rb`, and then ru
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/cylon-v/silicon.
+Bug reports and pull requests are welcome on GitHub at https://github.com/cylon-v/dandy.
 
 ## License
 

@@ -1,5 +1,5 @@
 require 'spec_helper'
-require 'silicon/routing/syntax/primitives/http_status'
+require 'dandy/routing/syntax/primitives/http_status'
 
 
 RSpec.describe Syntax::HttpStatus do

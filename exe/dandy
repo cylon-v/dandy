@@ -1,0 +1,5 @@
+#!/usr/bin/env ruby
+
+require 'dandy/generators/cli'
+
+Dandy::CLI.start ARGV

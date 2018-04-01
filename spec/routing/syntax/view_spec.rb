@@ -1,5 +1,5 @@
 require 'spec_helper'
-require 'silicon/routing/syntax/view'
+require 'dandy/routing/syntax/view'
 
 RSpec.describe Syntax::View do
   describe 'parse' do

@@ -1,8 +1,8 @@
 require 'spec_helper'
-require 'silicon/chain'
+require 'dandy/chain'
 require 'rack'
 
-RSpec.describe Silicon::Request do
+RSpec.describe Dandy::Request do
   describe 'handle' do
     before :each do
       @scope_lifetime = double(:scope_lifetime)
@@ -18,8 +18,8 @@ RSpec.describe Silicon::Request do
       allow(@request_component).to receive(:using_lifetime).and_return(@request_component)
       allow(@request_component).to receive(:bound_to).and_return(@request_component)
 
-      @request = Silicon::Request.new(@route_matcher, @container, @chain_factory, @view_factory)
-      allow(@container).to receive(:register_instance).with(@request, :silicon_request)
+      @request = Dandy::Request.new(@route_matcher, @container, @chain_factory, @view_factory)
+      allow(@container).to receive(:register_instance).with(@request, :dandy_request)
                              .and_return(@request_component)
     end
 
@@ -59,11 +59,11 @@ RSpec.describe Silicon::Request do
         @body = 'some response body'
         allow(@view_factory).to receive(:create).with(view_name, 'application/json').and_return(@body)
 
-        allow(@container).to receive(:resolve).with(:silicon_status).and_return(@status)
+        allow(@container).to receive(:resolve).with(:dandy_status).and_return(@status)
 
         @result_component = double(:result_component)
         allow(@result_component).to receive(:using_lifetime).with(:scope).and_return(@result_component)
-        allow(@result_component).to receive(:bound_to).with(:silicon_request)
+        allow(@result_component).to receive(:bound_to).with(:dandy_request)
 
         form_data = {
           field1: "one",
@@ -82,11 +82,11 @@ RSpec.describe Silicon::Request do
 
       it 'correctly parses and registers query params and form data' do
         expect(@container).to receive(:register_instance)
-                                .with({x: '1', y: 'two'}, :silicon_query)
+                                .with({x: '1', y: 'two'}, :dandy_query)
                                 .and_return(@result_component)
 
         expect(@container).to receive(:register_instance)
-                                .with({field1: 'one', field2: {nested_field: 1}}, :silicon_data)
+                                .with({field1: 'one', field2: {nested_field: 1}}, :dandy_data)
                                 .and_return(@result_component)
 
         @request.handle(@rack_env)
@@ -94,11 +94,11 @@ RSpec.describe Silicon::Request do
 
       it 'creates and executes the chain' do
         allow(@container).to receive(:register_instance)
-                                .with({x: '1', y: 'two'}, :silicon_query)
+                                .with({x: '1', y: 'two'}, :dandy_query)
                                 .and_return(@result_component)
 
         allow(@container).to receive(:register_instance)
-                                .with({field1: 'one', field2: {nested_field: 1}}, :silicon_data)
+                                .with({field1: 'one', field2: {nested_field: 1}}, :dandy_data)
                                 .and_return(@result_component)
 
         expect(@chain_factory).to receive(:create)
@@ -109,11 +109,11 @@ RSpec.describe Silicon::Request do
 
       it 'returns correct result' do
         allow(@container).to receive(:register_instance)
-                               .with({x: '1', y: 'two'}, :silicon_query)
+                               .with({x: '1', y: 'two'}, :dandy_query)
                                .and_return(@result_component)
 
         allow(@container).to receive(:register_instance)
-                               .with({field1: 'one', field2: {nested_field: 1}}, :silicon_data)
+                               .with({field1: 'one', field2: {nested_field: 1}}, :dandy_data)
                                .and_return(@result_component)
 
         expect(@chain_factory).to receive(:create)

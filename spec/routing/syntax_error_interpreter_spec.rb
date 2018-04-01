@@ -1,11 +1,11 @@
 require 'spec_helper'
-require 'silicon/routing/syntax_error_interpreter'
+require 'dandy/routing/syntax_error_interpreter'
 
-RSpec.describe Silicon::Routing::SyntaxErrorInterpreter do
+RSpec.describe Dandy::Routing::SyntaxErrorInterpreter do
   describe 'interpret' do
     before :each do
       @syntax_parser = double(:syntax_parser)
-      @syntax_error_interpreter = Silicon::Routing::SyntaxErrorInterpreter.new(@syntax_parser)
+      @syntax_error_interpreter = Dandy::Routing::SyntaxErrorInterpreter.new(@syntax_parser)
     end
 
     it 'correctly identifies line number where error is detected' do

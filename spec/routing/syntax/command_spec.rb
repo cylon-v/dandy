@@ -1,5 +1,5 @@
 require 'spec_helper'
-require 'silicon/routing/syntax/command'
+require 'dandy/routing/syntax/command'
 
 
 RSpec.describe Syntax::Command do

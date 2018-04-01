@@ -1,16 +1,16 @@
-require 'silicon/routing/routing'
-require 'silicon/config'
+require 'dandy/routing/routing'
+require 'dandy/config'
 
 RSpec.describe '[Integration] Syntax Parsing' do
   subject do
     syntax_parser = SyntaxParser.new
-    routes_builder = Silicon::Routing::Builder.new
-    config = Silicon::Config.new(@config_path)
-    file_reader = Silicon::Routing::FileReader.new(config)
+    routes_builder = Dandy::Routing::Builder.new
+    config = Dandy::Config.new(@config_path)
+    file_reader = Dandy::Routing::FileReader.new(config)
 
-    syntax_error_detector = Silicon::Routing::SyntaxErrorInterpreter.new(syntax_parser)
+    syntax_error_detector = Dandy::Routing::SyntaxErrorInterpreter.new(syntax_parser)
 
-    parser = Silicon::Routing::Parser.new(file_reader, routes_builder, syntax_parser, syntax_error_detector)
+    parser = Dandy::Routing::Parser.new(file_reader, routes_builder, syntax_parser, syntax_error_detector)
     parser.parse
   end
 

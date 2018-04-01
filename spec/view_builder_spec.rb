@@ -1,7 +1,7 @@
 require 'spec_helper'
-require 'silicon/view_builder'
+require 'dandy/view_builder'
 
-RSpec.describe Silicon::ViewBuilder do
+RSpec.describe Dandy::ViewBuilder do
   describe 'process' do
     before :each do
       template = '@name - powerful template engine.'
@@ -9,7 +9,7 @@ RSpec.describe Silicon::ViewBuilder do
       container = double(:container)
       allow(container).to receive(:resolve).with(:name).and_return('my_engine')
 
-      @view_builder = Silicon::ViewBuilder.new(template, container)
+      @view_builder = Dandy::ViewBuilder.new(template, container)
       allow(@view_builder).to receive(:build)
     end
 

@@ -1,7 +1,7 @@
 require 'spec_helper'
-require 'silicon/routing/file_reader'
+require 'dandy/routing/file_reader'
 
-RSpec.describe Silicon::Routing::FileReader do
+RSpec.describe Dandy::Routing::FileReader do
   describe 'read' do
     it 'loads and prepares routes definition file' do
       initial_content = "/users -> \n\tGET -> action1\n  POST -> action2 -> :respond <- list_users \n"
@@ -11,7 +11,7 @@ RSpec.describe Silicon::Routing::FileReader do
       allow(File).to receive(:read).and_return initial_content
 
       config = {path: {routes: 'app.routes'}}
-      file_reader = Silicon::Routing::FileReader.new(config)
+      file_reader = Dandy::Routing::FileReader.new(config)
       expect(file_reader.read).to eql expected_content
     end
   end

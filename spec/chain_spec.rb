@@ -1,10 +1,10 @@
 require 'spec_helper'
-require 'silicon/chain'
+require 'dandy/chain'
 
-RSpec.describe Silicon::Chain do
+RSpec.describe Dandy::Chain do
   describe 'execute' do
     before :each do
-      @silicon_config = {
+      @dandy_config = {
         action: {
           async_timeout: 5
         }
@@ -53,7 +53,7 @@ RSpec.describe Silicon::Chain do
       allow(@container).to receive(:register_instance).with('command3 result', :command3_result)
                              .and_return(component3)
 
-      @chain = Silicon::Chain.new(@container, @silicon_config, @commands, @catch_command)
+      @chain = Dandy::Chain.new(@container, @dandy_config, @commands, @catch_command)
     end
 
     context '-> command1 -> command2 -> command3 :catch' do
@@ -78,7 +78,7 @@ RSpec.describe Silicon::Chain do
 
           error_command = double(:error_command)
           allow(error_command).to receive_message_chain('using_lifetime.bound_to')
-          allow(@container).to receive(:register_instance).with(@error, :silicon_error)
+          allow(@container).to receive(:register_instance).with(@error, :dandy_error)
                                  .and_return(error_command)
         end
 
@@ -93,8 +93,8 @@ RSpec.describe Silicon::Chain do
           @chain.execute
         end
 
-        it 'silicon_error should be registered in container' do
-          expect(@container).to receive(:register_instance).with(@error, :silicon_error)
+        it 'dandy_error should be registered in container' do
+          expect(@container).to receive(:register_instance).with(@error, :dandy_error)
           @chain.execute
         end
       end
@@ -141,7 +141,7 @@ RSpec.describe Silicon::Chain do
 
           error_command = double(:error_command)
           allow(error_command).to receive_message_chain('using_lifetime.bound_to')
-          allow(@container).to receive(:register_instance).with(@error, :silicon_error)
+          allow(@container).to receive(:register_instance).with(@error, :dandy_error)
                                  .and_return(error_command)
         end
 
@@ -155,8 +155,8 @@ RSpec.describe Silicon::Chain do
           @chain.execute
         end
 
-        it 'silicon_error should be registered in container' do
-          expect(@container).to receive(:register_instance).with(@error, :silicon_error)
+        it 'dandy_error should be registered in container' do
+          expect(@container).to receive(:register_instance).with(@error, :dandy_error)
           @chain.execute
         end
       end
@@ -253,7 +253,7 @@ RSpec.describe Silicon::Chain do
 
     context 'when catch command is not defined' do
       before :each do
-        @chain = Silicon::Chain.new(@container, @silicon_config, @commands)
+        @chain = Dandy::Chain.new(@container, @dandy_config, @commands)
       end
 
       context 'and a chain command raises an error' do

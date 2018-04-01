@@ -1,7 +1,7 @@
 require 'spec_helper'
-require 'silicon/view_factory'
+require 'dandy/view_factory'
 
-RSpec.describe Silicon::ViewFactory do
+RSpec.describe Dandy::ViewFactory do
   describe 'create' do
     it 'creates a view' do
       name = 'view_name'
@@ -22,7 +22,7 @@ RSpec.describe Silicon::ViewFactory do
       view_builder_registry = double(:view_builder_registry)
       allow(view_builder_registry).to receive(:get).with('json').and_return(builder)
 
-      view_factory = Silicon::ViewFactory.new(container, template_registry, view_builder_registry)
+      view_factory = Dandy::ViewFactory.new(container, template_registry, view_builder_registry)
 
       expect(view).to receive(:process)
       view_factory.create(name,  'application/json')

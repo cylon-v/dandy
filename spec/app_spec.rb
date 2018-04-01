@@ -1,19 +1,19 @@
 require 'spec_helper'
 require 'hypo'
-require 'silicon/loaders/type_loader'
-require 'silicon/loaders/dependency_loader'
-require 'silicon/loaders/template_loader'
-require 'silicon/config'
-require 'silicon/request'
-require 'silicon/template_registry'
-require 'silicon/view_builder_registry'
-require 'silicon/view_factory'
-require 'silicon/chain_factory'
-require 'silicon/view_builders/json'
-require 'silicon/routing/routing'
-require 'silicon/app'
+require 'dandy/loaders/type_loader'
+require 'dandy/loaders/dependency_loader'
+require 'dandy/loaders/template_loader'
+require 'dandy/config'
+require 'dandy/request'
+require 'dandy/template_registry'
+require 'dandy/view_builder_registry'
+require 'dandy/view_factory'
+require 'dandy/chain_factory'
+require 'dandy/view_builders/json'
+require 'dandy/routing/routing'
+require 'dandy/app'
 
-RSpec.describe Silicon::App do
+RSpec.describe Dandy::App do
   before :each do
     @container = double(:container)
     @component = double(:component)
@@ -42,58 +42,58 @@ RSpec.describe Silicon::App do
 
   describe 'initialize' do
     it 'registers required dependencies' do
-      expect(@container).to receive(:register_instance).with('development', :silicon_env)
-      expect(@container).to receive(:register_instance).with('silicon.yml', :config_file_path)
+      expect(@container).to receive(:register_instance).with('development', :dandy_env)
+      expect(@container).to receive(:register_instance).with('dandy.yml', :config_file_path)
 
-      expect(@container).to receive(:register).with(Silicon::Config, :silicon_config).and_return(@component)
+      expect(@container).to receive(:register).with(Dandy::Config, :dandy_config).and_return(@component)
       expect(@component).to receive(:using_lifetime).with(:singleton)
 
-      expect(@container).to receive(:register).with(Silicon::TypeLoader, :type_loader).and_return(@component)
+      expect(@container).to receive(:register).with(Dandy::TypeLoader, :type_loader).and_return(@component)
       expect(@component).to receive(:using_lifetime).with(:singleton)
 
-      expect(@container).to receive(:register).with(Silicon::DependencyLoader, :dependency_loader).and_return(@component)
+      expect(@container).to receive(:register).with(Dandy::DependencyLoader, :dependency_loader).and_return(@component)
       expect(@component).to receive(:using_lifetime).with(:singleton)
 
-      expect(@container).to receive(:register).with(Silicon::TemplateLoader, :template_loader).and_return(@component)
+      expect(@container).to receive(:register).with(Dandy::TemplateLoader, :template_loader).and_return(@component)
       expect(@component).to receive(:using_lifetime).with(:singleton)
 
-      expect(@container).to receive(:register).with(Silicon::TemplateRegistry, :template_registry).and_return(@component)
+      expect(@container).to receive(:register).with(Dandy::TemplateRegistry, :template_registry).and_return(@component)
       expect(@component).to receive(:using_lifetime).with(:singleton)
 
-      expect(@container).to receive(:register).with(Silicon::ViewBuilderRegistry, :view_builder_registry).and_return(@component)
+      expect(@container).to receive(:register).with(Dandy::ViewBuilderRegistry, :view_builder_registry).and_return(@component)
       expect(@component).to receive(:using_lifetime).with(:singleton)
 
-      expect(@container).to receive(:register).with(Silicon::ViewFactory, :view_factory).and_return(@component)
+      expect(@container).to receive(:register).with(Dandy::ViewFactory, :view_factory).and_return(@component)
       expect(@component).to receive(:using_lifetime).with(:singleton)
 
-      expect(@container).to receive(:register).with(Silicon::ChainFactory, :chain_factory).and_return(@component)
+      expect(@container).to receive(:register).with(Dandy::ChainFactory, :chain_factory).and_return(@component)
       expect(@component).to receive(:using_lifetime).with(:singleton)
 
-      expect(@container).to receive(:register).with(Silicon::Routing::FileReader, :file_reader).and_return(@component)
+      expect(@container).to receive(:register).with(Dandy::Routing::FileReader, :file_reader).and_return(@component)
       expect(@component).to receive(:using_lifetime).with(:singleton)
 
       expect(@container).to receive(:register).with(SyntaxParser, :syntax_parser).and_return(@component)
       expect(@component).to receive(:using_lifetime).with(:singleton)
 
-      expect(@container).to receive(:register).with(Silicon::Routing::SyntaxErrorInterpreter, :syntax_error_interpreter).and_return(@component)
+      expect(@container).to receive(:register).with(Dandy::Routing::SyntaxErrorInterpreter, :syntax_error_interpreter).and_return(@component)
       expect(@component).to receive(:using_lifetime).with(:singleton)
 
-      expect(@container).to receive(:register).with(Silicon::Routing::Builder, :routes_builder).and_return(@component)
+      expect(@container).to receive(:register).with(Dandy::Routing::Builder, :routes_builder).and_return(@component)
       expect(@component).to receive(:using_lifetime).with(:singleton)
 
-      expect(@container).to receive(:register).with(Silicon::Routing::Parser, :route_parser).and_return(@component)
+      expect(@container).to receive(:register).with(Dandy::Routing::Parser, :route_parser).and_return(@component)
       expect(@component).to receive(:using_lifetime).with(:singleton)
 
-      Silicon::App.new(@container)
+      Dandy::App.new(@container)
     end
 
     it 'registers default Json view builder' do
       allow(@container).to receive(:register).and_return(@component)
       allow(@component).to receive(:using_lifetime).with(:singleton)
 
-      expect(@view_builder_registry).to receive(:add).with(Silicon::ViewBuilders::Json, 'json')
+      expect(@view_builder_registry).to receive(:add).with(Dandy::ViewBuilders::Json, 'json')
 
-      Silicon::App.new(@container)
+      Dandy::App.new(@container)
     end
   end
 
@@ -107,10 +107,10 @@ RSpec.describe Silicon::App do
       route_matcher = double(:route_matcher)
       env = double(:env)
 
-      app = Silicon::App.new(@container)
+      app = Dandy::App.new(@container)
       app.instance_variable_set('@route_matcher', route_matcher)
 
-      expect(Silicon::Request).to receive(:new).with(route_matcher, @container, @chain_factory, @view_factory).and_return(request)
+      expect(Dandy::Request).to receive(:new).with(route_matcher, @container, @chain_factory, @view_factory).and_return(request)
       expect(request).to receive(:handle).with(env)
       app.call(env)
     end

@@ -1,6 +1,6 @@
 require 'spec_helper'
-require 'silicon/routing/syntax/catch_section'
-require 'silicon/routing/syntax/command'
+require 'dandy/routing/syntax/catch_section'
+require 'dandy/routing/syntax/command'
 
 RSpec.describe Syntax::CatchSection do
   describe 'parse' do
