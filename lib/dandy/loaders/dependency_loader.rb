@@ -14,7 +14,7 @@ module Dandy
       end
 
       @types.each do |type|
-        @container.register(type).using_lifetime(:scope).bound_to(:dandy_request)
+        @container.register(type[:class], type[:path].to_sym).using_lifetime(:scope).bound_to(:dandy_request)
       end
     end
   end

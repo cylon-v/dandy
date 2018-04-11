@@ -11,7 +11,13 @@ RSpec.describe Dandy::TypeLoader do
       }
 
       type_loader = Dandy::TypeLoader.new(dandy_config)
-      expect(type_loader.load_types).to eql [Type1, Type2]
+      expect(type_loader.load_types).to eql [{
+        class: Type1,
+        path: 'path/to/type1'
+      },{
+        class: Type2,
+        path: 'type2'
+      }]
     end
   end
 end

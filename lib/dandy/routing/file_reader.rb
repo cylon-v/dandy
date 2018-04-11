@@ -7,10 +7,15 @@ module Dandy
 
       def read
         path = File.join('./', @config[:path][:routes])
-        content = File.read(path)
+        raw_content = File.read(path)
+
+        raw_content.gsub!(/\\\s*\n+\s*->/, '->')
+        raw_content.gsub!(/\\\s*\n+\s*=>/, '=>')
+        raw_content.gsub!(/\\\s*\n+\s*=\*/, '=>')
+
 
         # use '^' instead spaces and tabs
-        raw_content = content.gsub(/\t/, '  ')
+        raw_content = raw_content.gsub(/\t/, '  ')
                         .gsub('  ', '^')
                         .gsub(' ', '')
 
@@ -20,7 +25,7 @@ module Dandy
         ###
         raw_content = raw_content.gsub('->', '*>').gsub('<-', '<*')
 
-        raw_content.gsub!("\n", ';') + ';'
+        raw_content.gsub("\n", ';') + ';'
       end
     end
   end

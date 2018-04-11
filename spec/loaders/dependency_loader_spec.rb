@@ -12,7 +12,13 @@ RSpec.describe Dandy::DependencyLoader do
       @type1 = double(:type1)
       @type2 = double(:type2)
 
-      allow(@type_loader).to receive(:load_types).and_return([@type1, @type2])
+      allow(@type_loader).to receive(:load_types).and_return([{
+        class: @type1,
+        path: 'path/to/type1'
+      }, {
+        class: @type2,
+        path: 'type2'
+      }])
       allow(@container).to receive(:register).and_return(@container)
       allow(@container).to receive(:using_lifetime).and_return(@container)
       allow(@container).to receive(:bound_to)
@@ -21,8 +27,8 @@ RSpec.describe Dandy::DependencyLoader do
     context 'in common case' do
       it 'register all loaded types in container using lifetime "scope" and bound to the request' do
         expect(@type_loader).to receive(:load_types)
-        expect(@container).to receive(:register).with(@type1)
-        expect(@container).to receive(:register).with(@type2)
+        expect(@container).to receive(:register).with(@type1, :'path/to/type1')
+        expect(@container).to receive(:register).with(@type2, :type2)
         expect(@container).to receive(:using_lifetime).with(:scope).twice
         expect(@container).to receive(:bound_to).with(:dandy_request).twice
 

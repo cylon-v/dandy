@@ -15,7 +15,8 @@
             /users ->
                 GET -> list_users
                 $id ->
-                    GET => notify_admin -> current_user@load_user -> :respond <- users/show_user
+                    GET => notify_admin -> current_user@load_user \
+                        -> :respond <- users/show_user
 
             /posts ->
                 GET -> list_posts
@@ -30,7 +31,8 @@
 
                     /comments ->
                         GET -> list_comments
-                        POST => add_comment => notify_author =* notify_subscribers -> :respond <- comment_test =201
+                        POST => add_comment => notify_author \
+                             =* notify_subscribers -> :respond <- comment_test =201
 
                         $comment_id ->
                             GET -> show_comment -> :respond <- comment
