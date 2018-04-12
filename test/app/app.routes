@@ -1,5 +1,0 @@
-:receive
-    .->
-        :before -> common/open_db_session
-        GET -> welcome -> :respond <- show_welcome
-:catch -> handle_errors
