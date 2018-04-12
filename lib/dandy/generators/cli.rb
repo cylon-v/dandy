@@ -10,15 +10,29 @@ module Dandy
     end
 
     desc 'new NAME', 'Create new Dandy application'
+    method_options :jet_set => :boolean
     def new(name)
-      copy_file 'templates/app/app.rb', "#{name}/app/app.rb"
+
+      if options[:jet_set]
+        copy_file 'templates/app/app_jet_set.rb', "#{name}/app/app.rb"
+        copy_file 'templates/Gemfile_jet_set', "#{name}/Gemfile"
+        copy_file 'templates/db/mapping.rb', "#{name}/db/mapping.rb"
+        copy_file 'templates/actions/common/open_db_session.rb', "#{name}/app/actions/common/open_db_session.rb"
+      else
+        copy_file 'templates/app/app.rb', "#{name}/app/app.rb"
+        copy_file 'templates/Gemfile', "#{name}/Gemfile"
+      end
+
       copy_file 'templates/app/app.routes', "#{name}/app/app.routes"
       copy_file 'templates/dandy.yml', "#{name}/dandy.yml"
       copy_file 'templates/config.ru', "#{name}/config.ru"
       copy_file 'templates/views/show_welcome.json.jbuilder', "#{name}/app/views/show_welcome.json.jbuilder"
       copy_file 'templates/actions/common/handle_errors.rb', "#{name}/app/actions/common/handle_errors.rb"
-      copy_file 'templates/Gemfile', "#{name}/Gemfile"
       template 'templates/actions/welcome.tt', "#{name}/app/actions/welcome.rb", {app_name: name}
+
+      if options[:jet_set]
+        insert_into_file "#{name}/app/app.routes", "        :before -> common/open_db_session\n", :after => ".->\n"
+      end
 
       inside name do
         run 'bundle'
