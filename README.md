@@ -1,4 +1,4 @@
-# Dandy
+# Dandy ![Build Status](https://travis-ci.org/cylon-v/dandy.svg?branch=master)
 
 Dandy is a minimalistic web API framework. Its main idea is to implement an approach 
 from Clean Architecture principles - "web is just a delivery mechanism". 
