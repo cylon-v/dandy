@@ -12,6 +12,7 @@ module Dandy
     desc 'new NAME', 'Create new Dandy application'
     method_options :jet_set => :boolean
     def new(name)
+      copy_file 'templates/.gitignore', "#{name}/.gitignore"
 
       if options[:jet_set]
         copy_file 'templates/app/app_jet_set.rb', "#{name}/app/app.rb"
