@@ -2,8 +2,4 @@ class Welcome
   def call
     "Welcome to <%= config[:app_name] %>!"
   end
-
-  def result_name
-    'message'
-  end
 end

@@ -1,4 +1,4 @@
 :receive
     .->
-        GET -> welcome -> :respond <- show_welcome
+        GET -> message@welcome -> :respond <- show_welcome
 :catch -> handle_errors
