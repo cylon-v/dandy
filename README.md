@@ -35,7 +35,8 @@ own language for that. Small example:
             $id ->
                 :before -> load_post
                 /comments ->
-                    POST -> add_comment -> notify_author -> notify_subscribers -> :respond <- comment_test =201
+                    POST -> add_comment -> notify_author \
+                         -> notify_subscribers -> :respond <- comment_test =201
 :catch -> handle_errors
 ```
 
