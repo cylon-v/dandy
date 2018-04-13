@@ -4,7 +4,7 @@ gem 'rack-cors'
 gem 'hypo'
 gem 'dandy'
 
-gem 'sqlite'
+gem 'sqlite3'
 #gem 'pg'
 
 gem 'sequel'
