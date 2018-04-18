@@ -30,12 +30,9 @@ module Dandy
         register_params(data, :dandy_data)
 
         chain = @chain_factory.create(match)
-        chain.execute
+        result = chain.execute
 
-        body = ''
-        if match.route.view
-          body = @view_factory.create(match.route.view, content_type)
-        end
+        body = match.route.view ? @view_factory.create(match.route.view, content_type) : result
 
         status = @container.resolve(:dandy_status)
         result = [status, { 'Content-Type' => content_type }, [body]]

@@ -71,6 +71,18 @@ RSpec.describe Dandy::Chain do
         @chain.execute
       end
 
+      it 'returns last command result' do
+        result1 = 'command1 result'
+        result2 = 'command2 result'
+        result3 = 'command3 result'
+
+        allow(@command1).to receive(:call).and_return(result1)
+        allow(@command2).to receive(:call).and_return(result2)
+        allow(@command3).to receive(:call).and_return(result3)
+
+        expect(@chain.execute).to eql(result3)
+      end
+
       context 'when command1 raises exception' do
         before :each do
           @error = StandardError.new
@@ -98,6 +110,7 @@ RSpec.describe Dandy::Chain do
           @chain.execute
         end
       end
+
     end
 
     context '=> command1 => command2 -> command3 :catch' do
