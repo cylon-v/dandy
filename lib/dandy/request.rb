@@ -1,3 +1,4 @@
+require 'json'
 require 'dandy/chain_factory'
 require 'dandy/view_factory'
 
@@ -30,9 +31,13 @@ module Dandy
         register_params(data, :dandy_data)
 
         chain = @chain_factory.create(match)
-        result = chain.execute
+        chain_result = chain.execute
 
-        body = match.route.view ? @view_factory.create(match.route.view, content_type) : result
+        if match.route.view
+          body =  @view_factory.create(match.route.view, content_type)
+        else
+          body = chain_result.is_a?(String) ? chain_result : JSON.generate(chain_result)
+        end
 
         status = @container.resolve(:dandy_status)
         result = [status, { 'Content-Type' => content_type }, [body]]

@@ -16,7 +16,7 @@ use Rack::Cors do
   #   end
 end
 
-if ENV['DANDY_ENV'] == 'development' || ENV['DANDY_ENV'] == ''
+if ENV['DANDY_ENV'] == 'development' || ENV['DANDY_ENV'].nil?
   use Rack::Reloader
 end
 

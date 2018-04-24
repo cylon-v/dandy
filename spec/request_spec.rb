@@ -45,19 +45,12 @@ RSpec.describe Dandy::Request do
 
     context 'when route matched' do
       before :each do
-        view_name = 'some_view'
+        @view_name = 'some_view'
         @status = 200
-
-        route = double(:route, {view: view_name})
-        match = double(:match, {route: route})
-        allow(@route_matcher).to receive(:match).and_return(match)
 
         @chain = double(:chain)
         allow(@chain).to receive(:execute)
         allow(@chain_factory).to receive(:create).and_return(@chain)
-
-        @body = 'some response body'
-        allow(@view_factory).to receive(:create).with(view_name, 'application/json').and_return(@body)
 
         allow(@container).to receive(:resolve).with(:dandy_status).and_return(@status)
 
@@ -80,49 +73,97 @@ RSpec.describe Dandy::Request do
         }
       end
 
-      it 'correctly parses and registers query params and form data' do
-        expect(@container).to receive(:register_instance)
-                                .with({x: '1', y: 'two'}, :dandy_query)
-                                .and_return(@result_component)
+      context 'when view is defined' do
+        before :each do
+          route = double(:route, {view: @view_name})
+          match = double(:match, {route: route})
+          allow(@route_matcher).to receive(:match).and_return(match)
 
-        expect(@container).to receive(:register_instance)
-                                .with({field1: 'one', field2: {nested_field: 1}}, :dandy_data)
-                                .and_return(@result_component)
+          @body = 'some response body'
+          allow(@view_factory).to receive(:create).with(@view_name, 'application/json').and_return(@body)
+        end
 
-        @request.handle(@rack_env)
+        it 'correctly parses and registers query params and form data' do
+          expect(@container).to receive(:register_instance)
+                                  .with({x: '1', y: 'two'}, :dandy_query)
+                                  .and_return(@result_component)
+
+          expect(@container).to receive(:register_instance)
+                                  .with({field1: 'one', field2: {nested_field: 1}}, :dandy_data)
+                                  .and_return(@result_component)
+
+          @request.handle(@rack_env)
+        end
+
+        it 'creates and executes the chain' do
+          allow(@container).to receive(:register_instance)
+                                 .with({x: '1', y: 'two'}, :dandy_query)
+                                 .and_return(@result_component)
+
+          allow(@container).to receive(:register_instance)
+                                 .with({field1: 'one', field2: {nested_field: 1}}, :dandy_data)
+                                 .and_return(@result_component)
+
+          expect(@chain_factory).to receive(:create)
+          expect(@chain).to receive(:execute)
+
+          @request.handle(@rack_env)
+        end
+
+        it 'returns correct result' do
+          allow(@container).to receive(:register_instance)
+                                 .with({x: '1', y: 'two'}, :dandy_query)
+                                 .and_return(@result_component)
+
+          allow(@container).to receive(:register_instance)
+                                 .with({field1: 'one', field2: {nested_field: 1}}, :dandy_data)
+                                 .and_return(@result_component)
+
+          expect(@chain_factory).to receive(:create)
+          expect(@chain).to receive(:execute)
+
+          result = @request.handle(@rack_env)
+          expect(result[0]).to eql(@status)
+          expect(result[1]).to eql({ 'Content-Type' => 'application/json'})
+          expect(result[2]).to eql([@body])
+        end
       end
 
-      it 'creates and executes the chain' do
-        allow(@container).to receive(:register_instance)
-                                .with({x: '1', y: 'two'}, :dandy_query)
-                                .and_return(@result_component)
+      context 'when view is not defined' do
+        before :each do
+          route = double(:route, {view: nil})
+          match = double(:match, {route: route})
+          allow(@route_matcher).to receive(:match).and_return(match)
 
-        allow(@container).to receive(:register_instance)
-                                .with({field1: 'one', field2: {nested_field: 1}}, :dandy_data)
-                                .and_return(@result_component)
+          allow(@view_factory).to receive(:create).with(@view_name, 'application/json').and_return(nil)
+          allow(@container).to receive(:register_instance)
+                                 .with({x: '1', y: 'two'}, :dandy_query)
+                                 .and_return(@result_component)
 
-        expect(@chain_factory).to receive(:create)
-        expect(@chain).to receive(:execute)
+          allow(@container).to receive(:register_instance)
+                                 .with({field1: 'one', field2: {nested_field: 1}}, :dandy_data)
+                                 .and_return(@result_component)
 
-        @request.handle(@rack_env)
-      end
+          allow(@chain_factory).to receive(:create).and_return(@chain)
+        end
 
-      it 'returns correct result' do
-        allow(@container).to receive(:register_instance)
-                               .with({x: '1', y: 'two'}, :dandy_query)
-                               .and_return(@result_component)
+        context 'when result is a String' do
+          it 'returns it as is' do
+            allow(@chain).to receive(:execute).and_return('some-string-result')
 
-        allow(@container).to receive(:register_instance)
-                               .with({field1: 'one', field2: {nested_field: 1}}, :dandy_data)
-                               .and_return(@result_component)
+            result = @request.handle(@rack_env)
+            expect(result[2]).to eql(['some-string-result'])
+          end
+        end
 
-        expect(@chain_factory).to receive(:create)
-        expect(@chain).to receive(:execute)
+        context 'when result is an Object (i.e. Hash)' do
+          it 'returns JSON' do
+            allow(@chain).to receive(:execute).and_return({some: 'result'})
 
-        result = @request.handle(@rack_env)
-        expect(result[0]).to eql(@status)
-        expect(result[1]).to eql({ 'Content-Type' => 'application/json'})
-        expect(result[2]).to eql([@body])
+            result = @request.handle(@rack_env)
+            expect(result[2]).to eql(['{"some":"result"}'])
+          end
+        end
       end
     end
   end

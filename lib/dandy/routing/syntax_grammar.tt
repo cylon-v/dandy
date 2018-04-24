@@ -28,7 +28,7 @@ grammar Syntax
   end
 
   rule path
-    ('.' / ('/' [a-z0-9_\-]+)) 1..1 <Path>
+    ('.' / (('/' [a-z0-9_\-]+)+)) 1..1 <Path>
   end
 
   rule http_verb
