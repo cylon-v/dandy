@@ -1,4 +1,5 @@
 require 'json'
+require 'dandy/extensions/hash'
 require 'dandy/chain_factory'
 require 'dandy/view_factory'
 
@@ -27,7 +28,7 @@ module Dandy
         query = Rack::Utils.parse_nested_query(rack_env['QUERY_STRING']).symbolize_keys
         register_params(query, :dandy_query)
 
-        data = rack_env['rack.parser.result']
+        data = rack_env['rack.parser.result'] ? rack_env['rack.parser.result'].deep_symbolize_keys! : nil
         register_params(data, :dandy_data)
 
         chain = @chain_factory.create(match)
