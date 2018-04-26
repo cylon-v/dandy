@@ -20,10 +20,17 @@ module Dandy
       path = rack_env['PATH_INFO']
       request_method = rack_env['REQUEST_METHOD']
       match = @route_matcher.match(path, request_method)
-      content_type = rack_env['CONTENT_TYPE'] || 'application/json'
+
+      headers = Hash[
+        *rack_env.select {|k, v| k.start_with? 'HTTP_'}
+           .collect {|k, v| [k.sub(/^HTTP_/, ''), v]}
+           .collect {|k, v| [k.split('_').collect(&:capitalize).join('-'), v]}
+           .flatten
+      ]
+      register_params(headers, :dandy_headers)
 
       if match.nil?
-        result = [404, { 'Content-Type' => content_type }, []]
+        result = [404, {'Content-Type' => headers['Accept']}, []]
       else
         query = Rack::Utils.parse_nested_query(rack_env['QUERY_STRING']).symbolize_keys
         register_params(query, :dandy_query)
@@ -35,13 +42,13 @@ module Dandy
         chain_result = chain.execute
 
         if match.route.view
-          body =  @view_factory.create(match.route.view, content_type)
+          body = @view_factory.create(match.route.view, headers['Accept'])
         else
           body = chain_result.is_a?(String) ? chain_result : JSON.generate(chain_result)
         end
 
         status = @container.resolve(:dandy_status)
-        result = [status, { 'Content-Type' => content_type }, [body]]
+        result = [status, {'Content-Type' => headers['Accept']}, [body]]
       end
 
       release
@@ -50,6 +57,7 @@ module Dandy
     end
 
     private
+
     def create_scope
       @container
         .register_instance(self, :dandy_request)

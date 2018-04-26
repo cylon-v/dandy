@@ -5,6 +5,13 @@ require 'rack'
 RSpec.describe Dandy::Request do
   describe 'handle' do
     before :each do
+      @rack_env = {
+        'PATH_INFO' => '/user/1/update',
+        'REQUEST_METHOD' => 'PATCH',
+        'HTTP_ACCEPT' => 'application/json',
+        'HTTP_CACHE_CONTROL' => 'no-cache'
+      }
+
       @scope_lifetime = double(:scope_lifetime)
       allow(@scope_lifetime).to receive(:purge)
 
@@ -19,16 +26,17 @@ RSpec.describe Dandy::Request do
       allow(@request_component).to receive(:bound_to).and_return(@request_component)
 
       @request = Dandy::Request.new(@route_matcher, @container, @chain_factory, @view_factory)
+
+      allow(@container).to receive(:register_instance)
+                              .with({'Accept' => 'application/json', 'Cache-Control' => 'no-cache'}, :dandy_headers)
+                              .and_return(@request_component)
+
       allow(@container).to receive(:register_instance).with(@request, :dandy_request)
                              .and_return(@request_component)
     end
 
     context 'when route not matched' do
       before :each do
-        @rack_env = {
-          'PATH_INFO' => '/user/1/update',
-          'REQUEST_METHOD' => 'PATCH'
-        }
         allow(@route_matcher).to receive(:match).and_return(nil)
       end
 
@@ -69,6 +77,8 @@ RSpec.describe Dandy::Request do
           'PATH_INFO' => '/user/1/update',
           'REQUEST_METHOD' => 'PATCH',
           'QUERY_STRING' => 'x=1&y=two',
+          'HTTP_ACCEPT' => 'application/json',
+          'HTTP_CACHE_CONTROL' => 'no-cache',
           'rack.parser.result' => form_data
         }
       end
@@ -85,6 +95,10 @@ RSpec.describe Dandy::Request do
 
         it 'correctly parses and registers query params and form data' do
           expect(@container).to receive(:register_instance)
+                                  .with({'Accept' => 'application/json', 'Cache-Control' => 'no-cache'}, :dandy_headers)
+                                  .and_return(@result_component)
+
+          expect(@container).to receive(:register_instance)
                                   .with({x: '1', y: 'two'}, :dandy_query)
                                   .and_return(@result_component)
 
@@ -96,6 +110,10 @@ RSpec.describe Dandy::Request do
         end
 
         it 'creates and executes the chain' do
+          allow(@container).to receive(:register_instance)
+                                  .with({'Accept' => 'application/json', 'Cache-Control' => 'no-cache'}, :dandy_headers)
+                                  .and_return(@result_component)
+
           allow(@container).to receive(:register_instance)
                                  .with({x: '1', y: 'two'}, :dandy_query)
                                  .and_return(@result_component)
@@ -111,6 +129,11 @@ RSpec.describe Dandy::Request do
         end
 
         it 'returns correct result' do
+          allow(@container).to receive(:register_instance)
+                                  .with({'Accept' => 'application/json', 'Cache-Control' => 'no-cache'}, :dandy_headers)
+                                  .and_return(@result_component)
+
+
           allow(@container).to receive(:register_instance)
                                  .with({x: '1', y: 'two'}, :dandy_query)
                                  .and_return(@result_component)
@@ -134,6 +157,11 @@ RSpec.describe Dandy::Request do
           route = double(:route, {view: nil})
           match = double(:match, {route: route})
           allow(@route_matcher).to receive(:match).and_return(match)
+
+          allow(@container).to receive(:register_instance)
+                                  .with({'Accept' => 'application/json', 'Cache-Control' => 'no-cache'}, :dandy_headers)
+                                  .and_return(@result_component)
+
 
           allow(@view_factory).to receive(:create).with(@view_name, 'application/json').and_return(nil)
           allow(@container).to receive(:register_instance)
