@@ -33,6 +33,7 @@ RSpec.describe Dandy::ChainFactory do
       allow(route).to receive(:http_status).and_return(nil)
       allow(route).to receive(:http_verb).and_return('POST')
       allow(route).to receive(:commands).and_return([command1, command2])
+      allow(route).to receive(:last_command).and_return(command2)
       allow(route).to receive(:catch).and_return(catch_command)
 
       params = {id: 'some-id', name: 'a name'}
@@ -47,7 +48,7 @@ RSpec.describe Dandy::ChainFactory do
       expect(container).to receive(:register_instance).with('a name', :name)
       expect(container).to receive(:register_instance).with(201, :dandy_status)
 
-      expect(Dandy::Chain).to receive(:new).with(container, dandy_config, [command1, command2], catch_command)
+      expect(Dandy::Chain).to receive(:new).with(container, dandy_config, [command1, command2], command2, catch_command)
 
       chain_factory.create(match)
     end

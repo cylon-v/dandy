@@ -26,6 +26,7 @@ module Dandy
                 view: action[:view],
                 http_status: action[:http_status],
                 catch: sections.catch.command,
+                last_command: action[:commands].last,
                 commands: restore_callbacks(route, :before) + action[:commands] + restore_callbacks(route, :after)
               })
             end

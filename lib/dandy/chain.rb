@@ -2,8 +2,9 @@ require 'timeout'
 
 module Dandy
   class Chain
-    def initialize(container, dandy_config, commands, catch_command = nil)
+    def initialize(container, dandy_config, commands, last_command, catch_command = nil)
       @commands = commands
+      @last_command = last_command
       @container = container
       @catch_command = catch_command
       @async_timeout = dandy_config[:action][:async_timeout]
@@ -40,11 +41,19 @@ module Dandy
           threads.each {|t| t.join}
           threads = []
 
-          result = run_command(command)
+          if @last_command && (command.name == @last_command.name)
+            result = run_command(command)
+          else
+            run_command(command)
+          end
         else
           thread = Thread.new {
             Timeout::timeout(@async_timeout) {
-              result = run_command(command)
+              if @last_command && (command.name == @last_command.name)
+                result = run_command(command)
+              else
+                run_command(command)
+              end
             }
           }
           threads << thread if command.parallel?

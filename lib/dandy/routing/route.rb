@@ -2,7 +2,7 @@ module Dandy
   module Routing
     class Route
       attr_reader :http_verb, :path, :params, :catch,
-                  :commands, :segments, :view, :http_status
+                  :commands, :segments, :view, :http_status, :last_command
 
       def initialize(hash)
         @http_verb = hash[:http_verb]
@@ -11,6 +11,7 @@ module Dandy
 
         @params = hash[:params]
         @commands = hash[:commands]
+        @last_command = hash[:last_command]
         @view = hash[:view]
         @http_status = hash[:http_status]
 

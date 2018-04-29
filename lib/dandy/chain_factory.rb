@@ -11,7 +11,7 @@ module Dandy
       status = match.route.http_status || default_http_status(match.route.http_verb)
       register_params(match.params)
       register_status(status)
-      Chain.new(@container, @dandy_config, match.route.commands, match.route.catch)
+      Chain.new(@container, @dandy_config, match.route.commands, match.route.last_command, match.route.catch)
     end
 
     private

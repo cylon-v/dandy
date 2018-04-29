@@ -53,7 +53,7 @@ RSpec.describe Dandy::Chain do
       allow(@container).to receive(:register_instance).with('command3 result', :command3_result)
                              .and_return(component3)
 
-      @chain = Dandy::Chain.new(@container, @dandy_config, @commands, @catch_command)
+      @chain = Dandy::Chain.new(@container, @dandy_config, @commands, @command3, @catch_command)
     end
 
     context '-> command1 -> command2 -> command3 :catch' do
@@ -266,7 +266,7 @@ RSpec.describe Dandy::Chain do
 
     context 'when catch command is not defined' do
       before :each do
-        @chain = Dandy::Chain.new(@container, @dandy_config, @commands)
+        @chain = Dandy::Chain.new(@container, @dandy_config, @commands, @command3)
       end
 
       context 'and a chain command raises an error' do
@@ -282,6 +282,24 @@ RSpec.describe Dandy::Chain do
         it 'throws the error up' do
           expect {@chain.execute}.to raise_error(@error)
         end
+      end
+    end
+
+    context '(with :after section) -> command1 -> command2 -> :after :catch' do
+      before :each do
+        @after_command = double(:after_command)
+        allow(@after_command).to receive(:name).and_return('after')
+        allow(@after_command).to receive(:result_name).and_return('after_result')
+        allow(@after_command).to receive(:call).and_return('after result')
+        allow(@container).to receive(:resolve).with(:after_command).and_return(@after_command)
+
+        allow(@command1).to receive(:sequential?).and_return(true)
+        allow(@command2).to receive(:sequential?).and_return(true)
+        allow(@command3).to receive(:sequential?).and_return(true)
+      end
+
+      it 'result from last command from main chain should be returned (ignore :after)' do
+        expect(@chain.execute).to eql('command3 result')
       end
     end
   end
