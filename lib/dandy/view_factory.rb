@@ -10,11 +10,11 @@ module Dandy
       @view_builder_registry = view_builder_registry
     end
 
-    def create(name, content_type)
+    def create(name, content_type, options = {})
       type = content_type.split('/')[1]
       template = @template_registry.get(name, type)
       builder = @view_builder_registry.get(type)
-      view = builder.new(template, @container)
+      view = builder.new(template, @container, options)
       view.process
     end
   end

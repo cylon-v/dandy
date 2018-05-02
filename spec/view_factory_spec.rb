@@ -14,7 +14,7 @@ RSpec.describe Dandy::ViewFactory do
       allow(view).to receive(:process)
 
       builder = double(:builder)
-      allow(builder).to receive(:new).with(template, container).and_return(view)
+      allow(builder).to receive(:new).with(template, container, {}).and_return(view)
 
       template_registry = double(:template_registry)
       allow(template_registry).to receive(:get).with(name, 'json').and_return(template)

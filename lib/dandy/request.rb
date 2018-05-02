@@ -2,6 +2,8 @@ require 'json'
 require 'dandy/extensions/hash'
 require 'dandy/chain_factory'
 require 'dandy/view_factory'
+require 'awrence'
+require 'plissken'
 
 module Dandy
   class Request
@@ -32,20 +34,31 @@ module Dandy
       if match.nil?
         result = [404, {'Content-Type' => headers['Accept']}, []]
       else
-        query = Rack::Utils.parse_nested_query(rack_env['QUERY_STRING']).symbolize_keys
+        query = Rack::Utils.parse_nested_query(rack_env['QUERY_STRING']).to_snake_keys.symbolize_keys
         register_params(query, :dandy_query)
 
-        data = rack_env['rack.parser.result'] ? rack_env['rack.parser.result'].deep_symbolize_keys! : nil
+        data = rack_env['rack.parser.result'] ? rack_env['rack.parser.result'].to_snake_keys.deep_symbolize_keys! : nil
         register_params(data, :dandy_data)
 
         chain = @chain_factory.create(match)
         chain_result = chain.execute
 
         if match.route.view
-          body = @view_factory.create(match.route.view, headers['Accept'])
+          body = @view_factory.create(match.route.view, headers['Accept'], {keys_format: headers['Keys-Format'] || 'snake'})
         else
-          body = chain_result.is_a?(String) ? chain_result : JSON.generate(chain_result)
+          if chain_result.is_a?(String)
+            body = chain_result
+          else # generate JSON when nothing other is requested
+            if headers['Keys-Format'] == 'camel'
+              chain_result = chain_result.to_camelback_keys
+            end
+
+            body = JSON.generate(chain_result)
+          end
         end
+
+        puts headers
+
 
         status = @container.resolve(:dandy_status)
         result = [status, {'Content-Type' => headers['Accept']}, [body]]

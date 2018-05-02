@@ -6,6 +6,10 @@ module Dandy
     class Json < Dandy::ViewBuilder
       def build
         result = Jbuilder.new do |json|
+          if @options[:keys_format] == 'camel'
+            json.key_format! camelize: :lower
+          end
+
           eval(@template)
         end
 

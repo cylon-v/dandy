@@ -9,7 +9,7 @@ RSpec.describe Dandy::ViewBuilder do
       container = double(:container)
       allow(container).to receive(:resolve).with(:name).and_return('my_engine')
 
-      @view_builder = Dandy::ViewBuilder.new(template, container)
+      @view_builder = Dandy::ViewBuilder.new(template, container, {})
       allow(@view_builder).to receive(:build)
     end
 
