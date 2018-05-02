@@ -57,9 +57,6 @@ module Dandy
           end
         end
 
-        puts headers
-
-
         status = @container.resolve(:dandy_status)
         result = [status, {'Content-Type' => headers['Accept']}, [body]]
       end
