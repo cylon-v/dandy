@@ -7,6 +7,7 @@ require_relative 'syntax/primitives/http_status'
 require_relative 'syntax/primitives/parameter'
 require_relative 'syntax/primitives/path'
 require_relative 'syntax/primitives/result_name'
+require_relative 'syntax/primitives/entity_method'
 
 require_relative 'syntax/action'
 require_relative 'syntax/actions'

@@ -65,5 +65,41 @@ RSpec.describe Syntax::Command do
         expect(@command.result_name).to eql('result_name')
       end
     end
+
+    context 'it contains an entity method call (entity.method)' do
+      before :each do
+        allow(@command).to receive(:text_value).and_return('*>entity.method')
+        @command.parse
+      end
+
+      it 'should parse name and result name' do
+        expect(@command.entity_name).to eql('entity')
+        expect(@command.entity_method).to eql('method')
+      end
+    end
+
+    describe 'entity?' do
+      context 'when it contains entity call' do
+        before :each do
+          allow(@command).to receive(:text_value).and_return('*>entity.method')
+        end
+
+        it 'returns true' do
+          @command.parse
+          expect(@command.entity?).to be_truthy
+        end
+      end
+
+      context 'when it does not contain entity call' do
+        before :each do
+          allow(@command).to receive(:text_value).and_return('*>command_name')
+        end
+
+        it 'returns false' do
+          @command.parse
+          expect(@command.entity?).to be_falsey
+        end
+      end
+    end
   end
 end

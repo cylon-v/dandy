@@ -69,8 +69,19 @@ module Dandy
     end
 
     def run_command(command)
-      action = @container.resolve(command.name.to_sym)
-      result = action.call
+      if command.entity?
+        entity = @container.resolve(command.entity_name.to_sym)
+        method_name = command.entity_method.to_sym
+
+        param_names = entity.class.instance_method(method_name).parameters.map(&:last)
+        params = param_names.map {|param_name| @container.resolve(param_name)}
+
+        result = entity.public_send(method_name, *params)
+      else
+        action = @container.resolve(command.name.to_sym)
+        result = action.call
+      end
+
 
       @container
         .register_instance(result, command.result_name.to_sym)

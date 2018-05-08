@@ -1,6 +1,6 @@
 module Syntax
   class Command < Treetop::Runtime::SyntaxNode
-    attr_reader :name, :result_name
+    attr_reader :name, :result_name, :entity_method, :entity_name
 
     def parse
       @is_async = text_value.start_with? '=*'
@@ -18,6 +18,12 @@ module Syntax
         @name = full_name
       end
 
+      if full_name.include? '.'
+        parts = full_name.split('.')
+        @entity_name = parts[0]
+        @entity_method = parts[1]
+      end
+
       self
     end
 
@@ -31,6 +37,10 @@ module Syntax
 
     def sequential?
       @is_sequential
+    end
+
+    def entity?
+      @entity_name && @entity_method
     end
   end
 end

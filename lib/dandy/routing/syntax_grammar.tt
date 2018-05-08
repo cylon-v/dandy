@@ -40,11 +40,15 @@ grammar Syntax
   end
 
   rule command
-    (arrow result_name [a-z0-9_\/]+) 1..1 <Command>
+    (arrow result_name [a-z0-9_\/]+ entity_method) 1..1 <Command>
   end
 
   rule result_name
     ([a-z0-9_]+ '@') 0..1 <ResultName>
+  end
+
+  rule entity_method
+    ('.' [a-z0-9_]+ ) 0..1 <EntityMethod>
   end
 
   rule commands

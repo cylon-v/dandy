@@ -15,18 +15,21 @@ RSpec.describe Dandy::Chain do
       allow(@command1).to receive(:name).and_return('command1')
       allow(@command1).to receive(:result_name).and_return('command1_result')
       allow(@command1).to receive(:call).and_return('command1 result')
+      allow(@command1).to receive(:entity?).and_return(false)
       allow(@container).to receive(:resolve).with(:command1).and_return(@command1)
 
       @command2 = double(:command2)
       allow(@command2).to receive(:name).and_return('command2')
       allow(@command2).to receive(:result_name).and_return('command2_result')
       allow(@command2).to receive(:call).and_return('command2 result')
+      allow(@command2).to receive(:entity?).and_return(false)
       allow(@container).to receive(:resolve).with(:command2).and_return(@command2)
 
       @command3 = double(:command3)
       allow(@command3).to receive(:name).and_return('command3')
       allow(@command3).to receive(:result_name).and_return('command3_result')
       allow(@command3).to receive(:call).and_return('command3 result')
+      allow(@command3).to receive(:entity?).and_return(false)
       allow(@container).to receive(:resolve).with(:command3).and_return(@command3)
 
       @catch_command = double(:catch_command)
@@ -300,6 +303,42 @@ RSpec.describe Dandy::Chain do
 
       it 'result from last command from main chain should be returned (ignore :after)' do
         expect(@chain.execute).to eql('command3 result')
+      end
+    end
+
+    context 'when command2 is an entity with method like "user.like"' do
+      before :each do
+        @entity = double(:entity)
+        @entity_class = double(:entity_class)
+        @parameter = double(:parameter)
+        @parameters = [[:req, :comment]]
+        @instance_method = double(:instance_method)
+        @method_result = double(:method_result)
+
+        allow(@command2).to receive(:sequential?).and_return(true)
+        allow(@entity_class).to receive(:instance_method).and_return(@instance_method)
+        allow(@entity).to receive(:class).and_return(@entity_class)
+        allow(@instance_method).to receive(:parameters).and_return(@parameters)
+        allow(@command2).to receive(:entity?).and_return(true)
+        allow(@command2).to receive(:entity_name).and_return('user')
+        allow(@command2).to receive(:entity_method).and_return('like')
+
+        @chain = Dandy::Chain.new(@container, @dandy_config, [@command2], @command2, @catch_command)
+
+      end
+
+      it 'calls entity method' do
+        expect(@container).to receive(:resolve).with(:user).and_return(@entity)
+        expect(@container).to receive(:resolve).with(:comment).and_return(@parameter)
+        expect(@entity).to receive(:like).with(@parameter).and_return(@method_result)
+
+        result_component = double(:result_component)
+        allow(result_component).to receive_message_chain('using_lifetime.bound_to')
+        expect(@container).to receive(:register_instance).with(@method_result, :command2_result)
+                               .and_return(result_component)
+
+
+        @chain.execute
       end
     end
   end
