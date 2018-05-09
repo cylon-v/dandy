@@ -11,7 +11,7 @@ module Dandy
     end
 
     def create(name, content_type, options = {})
-      type = content_type.split('/')[1]
+      type = content_type ? content_type.split('/')[1] : 'json'
       template = @template_registry.get(name, type)
       builder = @view_builder_registry.get(type)
       view = builder.new(template, @container, options)
