@@ -1,4 +1,4 @@
-require 'timeout'
+require 'concurrent'
 
 module Dandy
   class Chain
@@ -31,15 +31,17 @@ module Dandy
     private
 
     def run_commands
-      threads = []
-      Thread.abort_on_exception = true
+      promises = []
 
       result = nil
       @commands.each_with_index do |command, index|
         if command.sequential?
           # all previous parallel commands should be done before the current sequential
-          threads.each {|t| t.join}
-          threads = []
+
+          unless promises.empty?
+            Concurrent::Promise.all?(*promises)
+            promises = []
+          end
 
           if @last_command && (command.name == @last_command.name)
             result = run_command(command)
@@ -47,21 +49,25 @@ module Dandy
             run_command(command)
           end
         else
-          thread = Thread.new {
-            Timeout::timeout(@async_timeout) {
-              if @last_command && (command.name == @last_command.name)
-                result = run_command(command)
-              else
-                run_command(command)
-              end
-            }
-          }
-          threads << thread if command.parallel?
+          promise = Concurrent::Promise.new do
+            if @last_command && (command.name == @last_command.name)
+              result = run_command(command)
+            else
+              run_command(command)
+            end
+
+            nil
+          end
+
+          promise = promise.execute
+          promises << promise if command.parallel?
         end
 
         # if it's last item in chain then wait until parallel commands are done
         if index == @commands.length - 1
-          threads.each {|t| t.join}
+          unless promises.empty?
+            Concurrent::Promise.all?(*promises).wait
+          end
         end
       end
 
