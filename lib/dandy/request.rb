@@ -49,7 +49,7 @@ module Dandy
           if chain_result.is_a?(String)
             body = chain_result
           else # generate JSON when nothing other is requested
-            if headers['Keys-Format'] == 'camel' && chain_result.is_a?(Hash)
+            if headers['Keys-Format'] == 'camel' && chain_result
               chain_result = chain_result.to_camelback_keys
             end
 
