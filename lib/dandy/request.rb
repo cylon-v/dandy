@@ -1,9 +1,11 @@
 require 'json'
+require 'rack/multipart'
 require 'dandy/extensions/hash'
 require 'dandy/chain_factory'
 require 'dandy/view_factory'
 require 'awrence'
 require 'plissken'
+
 
 module Dandy
   class Request
@@ -37,8 +39,11 @@ module Dandy
         query = Rack::Utils.parse_nested_query(rack_env['QUERY_STRING']).to_snake_keys.symbolize_keys
         register_params(query, :dandy_query)
 
-        data = rack_env['rack.parser.result'] ? rack_env['rack.parser.result'].to_snake_keys.deep_symbolize_keys! : nil
+        data = rack_env['rack.parser.result'] ? rack_env['rack.parser.result'].to_snake_keys.deep_symbolize_keys! : {}
         register_params(data, :dandy_data)
+
+        multipart = Rack::Multipart.parse_multipart(rack_env) || {}
+        register_params(multipart.values, :dandy_files)
 
         chain = @chain_factory.create(match)
         chain_result = chain.execute
