@@ -27,6 +27,12 @@ RSpec.describe Dandy::Request do
 
       @request = Dandy::Request.new(@route_matcher, @container, @chain_factory, @view_factory)
 
+      allow(Rack::Multipart).to receive(:parse_multipart).and_return(nil)
+
+      allow(@container).to receive(:register_instance)
+                             .with([], :dandy_files)
+                             .and_return(@request_component)
+
       allow(@container).to receive(:register_instance)
                              .with({'Accept' => 'application/json', 'Cache-Control' => 'no-cache'}, :dandy_headers)
                              .and_return(@request_component)
@@ -126,7 +132,7 @@ RSpec.describe Dandy::Request do
         end
 
 
-        it 'correctly parses and registers query params and form data' do
+        it 'correctly parses and registers query params and form data and files' do
           expect(@container).to receive(:register_instance)
                                   .with({'Accept' => 'application/json', 'Cache-Control' => 'no-cache'}, :dandy_headers)
                                   .and_return(@result_component)
@@ -137,6 +143,10 @@ RSpec.describe Dandy::Request do
 
           expect(@container).to receive(:register_instance)
                                   .with({field1: 'one', field2: {nested_field: 1}}, :dandy_data)
+                                  .and_return(@result_component)
+
+          expect(@container).to receive(:register_instance)
+                                  .with([], :dandy_files)
                                   .and_return(@result_component)
 
           @request.handle(@rack_env)
