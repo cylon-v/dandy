@@ -1,6 +1,5 @@
 require 'spec_helper'
 require 'dandy/loaders/dependency_loader'
-require 'dandy/chain_factory'
 require 'hypo'
 
 RSpec.describe Dandy::DependencyLoader do

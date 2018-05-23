@@ -9,9 +9,9 @@ require 'dandy/request'
 require 'dandy/template_registry'
 require 'dandy/view_builder_registry'
 require 'dandy/view_factory'
-require 'dandy/chain_factory'
 require 'dandy/view_builders/json'
 require 'dandy/routing/routing'
+require 'dandy/safe_executor'
 
 module Dandy
   class App
@@ -27,7 +27,7 @@ module Dandy
     end
 
     def call(env)
-      request = Request.new(@route_matcher, @container, @chain_factory, @view_factory)
+      request = Request.new(@route_matcher, @container, @safe_executor)
       request.handle(env)
     end
 
@@ -61,12 +61,12 @@ module Dandy
         template_registry: TemplateRegistry,
         view_builder_registry: ViewBuilderRegistry,
         view_factory: ViewFactory,
-        chain_factory: ChainFactory,
         file_reader: Routing::FileReader,
         syntax_parser: SyntaxParser,
         syntax_error_interpreter: Routing::SyntaxErrorInterpreter,
         routes_builder: Routing::Builder,
-        route_parser: Routing::Parser
+        route_parser: Routing::Parser,
+        safe_executor: SafeExecutor
       }
 
       singletons.keys.each do |name|
@@ -76,11 +76,12 @@ module Dandy
     end
 
     def load_basic_dependencies
-      @chain_factory = @container.resolve(:chain_factory)
+      @dandy_config = @container.resolve(:dandy_config)
       @view_factory = @container.resolve(:view_factory)
       @dependency_loader = @container.resolve(:dependency_loader)
       @view_builder_registry = @container.resolve(:view_builder_registry)
       @route_parser = @container.resolve(:route_parser)
+      @safe_executor = @container.resolve(:safe_executor)
 
       @dependency_loader.load_components
     end
