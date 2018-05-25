@@ -16,16 +16,23 @@ RSpec.describe Dandy::Request do
       allow(@scope_lifetime).to receive(:purge)
 
       @container = double(:container, lifetimes: {scope: @scope_lifetime})
-
       @route_matcher = double(:route_matcher)
-      @chain_factory = double(:chain_factory)
-      @view_factory = double(:view_factory)
+      @safe_executor = double(:safe_executor)
 
       @request_component = double(:request_component)
       allow(@request_component).to receive(:using_lifetime).and_return(@request_component)
       allow(@request_component).to receive(:bound_to).and_return(@request_component)
 
-      @request = Dandy::Request.new(@route_matcher, @container, @chain_factory, @view_factory)
+      @result_component = double(:result_component)
+      allow(@result_component).to receive(:using_lifetime).and_return(@result_component)
+      allow(@result_component).to receive(:bound_to)
+
+      @expected_headers = {
+        'Accept' => 'application/json',
+        'Cache-Control' => 'no-cache'
+      }
+
+      @request = Dandy::Request.new(@route_matcher, @container, @safe_executor)
 
       allow(Rack::Multipart).to receive(:parse_multipart).and_return(nil)
 
@@ -46,6 +53,12 @@ RSpec.describe Dandy::Request do
         allow(@route_matcher).to receive(:match).and_return(nil)
       end
 
+      it 'registers HTTP headers' do
+        expect(@container).to receive(:register_instance)
+                                .with(@expected_headers, :dandy_headers).and_return(@result_component)
+        @request.handle(@rack_env)
+      end
+
       it 'returns 404' do
         result = @request.handle(@rack_env)
         expect(result[0]).to eql(404)
@@ -59,18 +72,21 @@ RSpec.describe Dandy::Request do
 
     context 'when route matched' do
       before :each do
-        @view_name = 'some_view'
-        @status = 200
+        @status = 423
+        @params = {id: 1}
 
-        @chain = double(:chain)
-        allow(@chain).to receive(:execute)
-        allow(@chain_factory).to receive(:create).and_return(@chain)
+        @route = double(:route)
+        allow(@route).to receive(:http_status).and_return(@status)
+
+        @match = double(:match)
+        allow(@match).to receive(:route).and_return(@route)
+        allow(@match).to receive(:params).and_return(@params)
+        allow(@route_matcher).to receive(:match).and_return(@match)
+
+        allow(@safe_executor).to receive(:execute)
+        allow(@container).to receive(:register_instance).and_return(@result_component)
 
         allow(@container).to receive(:resolve).with(:dandy_status).and_return(@status)
-
-        @result_component = double(:result_component)
-        allow(@result_component).to receive(:using_lifetime).with(:scope).and_return(@result_component)
-        allow(@result_component).to receive(:bound_to).with(:dandy_request)
 
         form_data = {
           field1: "one",
@@ -89,182 +105,88 @@ RSpec.describe Dandy::Request do
         }
       end
 
-      context 'when view is defined' do
+      it 'registers HTTP headers' do
+        expect(@container).to receive(:register_instance)
+                                .with(@expected_headers, :dandy_headers).and_return(@result_component)
+        @request.handle(@rack_env)
+      end
+
+      context 'when HTTP status is not specified in the route' do
         before :each do
-          route = double(:route, {view: @view_name})
-          match = double(:match, {route: route})
-          allow(@route_matcher).to receive(:match).and_return(match)
-
-          @body = 'some response body'
-          allow(@view_factory).to receive(:create).with(@view_name, 'application/json', {keys_format: 'snake'}).and_return(@body)
+          allow(@route).to receive(:http_status).and_return(nil)
+          allow(@route).to receive(:http_verb).and_return('GET')
         end
 
-        context 'when client wants to receive keys in camel format' do
-          before :each do
-            @rack_env_camel = {
-              'PATH_INFO' => '/user/1/update',
-              'REQUEST_METHOD' => 'PATCH',
-              'HTTP_ACCEPT' => 'application/json',
-              'HTTP_KEYS_FORMAT' => 'camel'
-            }
-
-            allow(@container).to receive(:register_instance)
-                                   .with({'Accept' => 'application/json', 'Cache-Control' => 'no-cache'}, :dandy_headers)
-                                   .and_return(@result_component)
-
-            allow(@container).to receive(:register_instance)
-                                   .with({}, :dandy_query)
-                                   .and_return(@result_component)
-
-            allow(@container).to receive(:register_instance)
-                                   .with({}, :dandy_data)
-                                   .and_return(@result_component)
-          end
-
-          it 'creates view with such option' do
-            expect(@container).to receive(:register_instance)
-                                    .with({'Accept' => 'application/json', 'Keys-Format' => 'camel'}, :dandy_headers)
-                                    .and_return(@result_component)
-
-            expect(@view_factory).to receive(:create).with(@view_name, 'application/json', {keys_format: 'camel'}).and_return(@body)
-            @request.handle(@rack_env_camel)
-          end
-        end
-
-
-        it 'correctly parses and registers query params and form data and files' do
+        it 'registers default HTTP status for the verb' do
           expect(@container).to receive(:register_instance)
-                                  .with({'Accept' => 'application/json', 'Cache-Control' => 'no-cache'}, :dandy_headers)
-                                  .and_return(@result_component)
-
-          expect(@container).to receive(:register_instance)
-                                  .with({x: '1', y: 'two'}, :dandy_query)
-                                  .and_return(@result_component)
-
-          expect(@container).to receive(:register_instance)
-                                  .with({field1: 'one', field2: {nested_field: 1}}, :dandy_data)
-                                  .and_return(@result_component)
-
-          expect(@container).to receive(:register_instance)
-                                  .with([], :dandy_files)
-                                  .and_return(@result_component)
-
+                                  .with(200, :dandy_status).and_return(@result_component)
           @request.handle(@rack_env)
-        end
-
-        it 'creates and executes the chain' do
-          allow(@container).to receive(:register_instance)
-                                 .with({'Accept' => 'application/json', 'Cache-Control' => 'no-cache'}, :dandy_headers)
-                                 .and_return(@result_component)
-
-          allow(@container).to receive(:register_instance)
-                                 .with({x: '1', y: 'two'}, :dandy_query)
-                                 .and_return(@result_component)
-
-          allow(@container).to receive(:register_instance)
-                                 .with({field1: 'one', field2: {nested_field: 1}}, :dandy_data)
-                                 .and_return(@result_component)
-
-          expect(@chain_factory).to receive(:create)
-          expect(@chain).to receive(:execute)
-
-          @request.handle(@rack_env)
-        end
-
-        it 'returns correct result' do
-          allow(@container).to receive(:register_instance)
-                                 .with({'Accept' => 'application/json', 'Cache-Control' => 'no-cache'}, :dandy_headers)
-                                 .and_return(@result_component)
-
-
-          allow(@container).to receive(:register_instance)
-                                 .with({x: '1', y: 'two'}, :dandy_query)
-                                 .and_return(@result_component)
-
-          allow(@container).to receive(:register_instance)
-                                 .with({field1: 'one', field2: {nested_field: 1}}, :dandy_data)
-                                 .and_return(@result_component)
-
-          expect(@chain_factory).to receive(:create)
-          expect(@chain).to receive(:execute)
-
-          result = @request.handle(@rack_env)
-          expect(result[0]).to eql(@status)
-          expect(result[1]).to eql({'Content-Type' => 'application/json'})
-          expect(result[2]).to eql([@body])
         end
       end
 
-      context 'when view is not defined' do
+      context 'when HTTP status is specified in the route' do
         before :each do
-          route = double(:route, {view: nil})
-          match = double(:match, {route: route})
-          allow(@route_matcher).to receive(:match).and_return(match)
-
-          allow(@container).to receive(:register_instance)
-                                 .with({'Accept' => 'application/json', 'Cache-Control' => 'no-cache'}, :dandy_headers)
-                                 .and_return(@result_component)
-
-
-          allow(@view_factory).to receive(:create).with(@view_name, 'application/json').and_return(nil)
-          allow(@container).to receive(:register_instance)
-                                 .with({x: '1', y: 'two'}, :dandy_query)
-                                 .and_return(@result_component)
-
-          allow(@container).to receive(:register_instance)
-                                 .with({field1: 'one', field2: {nested_field: 1}}, :dandy_data)
-                                 .and_return(@result_component)
-
-          allow(@chain_factory).to receive(:create).and_return(@chain)
+          allow(@route).to receive(:http_status).and_return(@status)
         end
 
-        context 'when result is a String' do
-          it 'returns it as is' do
-            allow(@chain).to receive(:execute).and_return('some-string-result')
-
-            result = @request.handle(@rack_env)
-            expect(result[2]).to eql(['some-string-result'])
-          end
+        it 'registers the status' do
+          expect(@container).to receive(:register_instance)
+                                  .with(@status, :dandy_status).and_return(@result_component)
+          @request.handle(@rack_env)
         end
+      end
 
-        context 'when result is an Object (i.e. Hash)' do
-          before :each do
-            allow(@chain).to receive(:execute).and_return({some_result: 'value'})
-          end
 
-          it 'returns JSON' do
-            result = @request.handle(@rack_env)
-            expect(result[2]).to eql(['{"some_result":"value"}'])
-          end
+      it 'registers HTTP parameters' do
+        expect(@container).to receive(:register_instance)
+                                .with(@params[:id], :id).and_return(@result_component)
+        @request.handle(@rack_env)
+      end
 
-          context 'when client wants to receive keys in camel format' do
-            before :each do
-              @rack_env_camel = {
-                'PATH_INFO' => '/user/1/update',
-                'REQUEST_METHOD' => 'PATCH',
-                'HTTP_ACCEPT' => 'application/json',
-                'HTTP_KEYS_FORMAT' => 'camel'
-              }
+      it 'registers HTTP query parameters' do
+        query_params = {x: 1, y: 'two'}
+        allow(Rack::Utils).to receive(:parse_nested_query).and_return(query_params)
 
-              allow(@container).to receive(:register_instance)
-                                     .with({}, :dandy_query)
-                                     .and_return(@result_component)
+        expect(@container).to receive(:register_instance)
+                                .with(query_params, :dandy_query).and_return(@result_component)
+        @request.handle(@rack_env)
+      end
 
-              allow(@container).to receive(:register_instance)
-                                     .with({}, :dandy_data)
-                                     .and_return(@result_component)
+      it 'registers HTTP form data' do
+        expected_data = {
+          field1: "one",
+          field2: {
+            nested_field: 1
+          }
+        }
 
-              allow(@container).to receive(:register_instance)
-                                     .with({'Accept' => 'application/json', 'Keys-Format' => 'camel'}, :dandy_headers)
-                                     .and_return(@result_component)
-            end
+        expect(@container).to receive(:register_instance)
+                                .with(expected_data, :dandy_data).and_return(@result_component)
 
-            it 'returns camelized JSON' do
-              result = @request.handle(@rack_env_camel)
-              expect(result[2]).to eql(['{"someResult":"value"}'])
-            end
-          end
-        end
+        @request.handle(@rack_env)
+      end
+
+      it 'registers uploaded files' do
+        file1 = {name: 'file1'}
+        file2 = {name: 'file2'}
+
+        files = {file1: file1, file2: file2}
+        allow(Rack::Multipart).to receive(:parse_multipart).and_return(files)
+
+        expect(@container).to receive(:register_instance)
+                                .with([file1, file2], :dandy_files).and_return(@result_component)
+        @request.handle(@rack_env)
+      end
+
+      it 'pass the flow to safe_executor' do
+        expect(@safe_executor).to receive(:execute).with(@route, @expected_headers)
+        @request.handle(@rack_env)
+      end
+
+      it 'returns correct response' do
+        @body = {data: 'some data'}
+        allow(@safe_executor).to receive(:execute).and_return(@body)
+        expect(@request.handle(@rack_env)).to eql([@status, {'Content-Type' => 'application/json'}, [@body]])
       end
     end
   end

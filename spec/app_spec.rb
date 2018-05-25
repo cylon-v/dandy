@@ -8,7 +8,6 @@ require 'dandy/request'
 require 'dandy/template_registry'
 require 'dandy/view_builder_registry'
 require 'dandy/view_factory'
-require 'dandy/chain_factory'
 require 'dandy/view_builders/json'
 require 'dandy/routing/routing'
 require 'dandy/app'
@@ -21,8 +20,9 @@ RSpec.describe Dandy::App do
     allow(@container).to receive(:register_instance).and_return(@component)
     allow(@component).to receive(:using_lifetime)
 
-    @chain_factory = double(:chain_factory)
+    @dandy_config = double(:dandy_config)
     @view_factory = double(:view_factory)
+    @safe_executor = double(:safe_executor)
 
     @view_builder_registry = double(:view_builder_registry)
     allow(@view_builder_registry).to receive(:add)
@@ -33,11 +33,12 @@ RSpec.describe Dandy::App do
     @route_parser = double(:route_parser)
     allow(@route_parser).to receive(:parse).and_return([])
 
-    allow(@container).to receive(:resolve).with(:chain_factory).and_return(@chain_factory)
+    allow(@container).to receive(:resolve).with(:dandy_config).and_return(@dandy_config)
     allow(@container).to receive(:resolve).with(:view_factory).and_return(@view_factory)
     allow(@container).to receive(:resolve).with(:dependency_loader).and_return(@dependency_loader)
     allow(@container).to receive(:resolve).with(:view_builder_registry).and_return(@view_builder_registry)
     allow(@container).to receive(:resolve).with(:route_parser).and_return(@route_parser)
+    allow(@container).to receive(:resolve).with(:safe_executor).and_return(@safe_executor)
   end
 
   describe 'initialize' do
@@ -66,9 +67,6 @@ RSpec.describe Dandy::App do
       expect(@container).to receive(:register).with(Dandy::ViewFactory, :view_factory).and_return(@component)
       expect(@component).to receive(:using_lifetime).with(:singleton)
 
-      expect(@container).to receive(:register).with(Dandy::ChainFactory, :chain_factory).and_return(@component)
-      expect(@component).to receive(:using_lifetime).with(:singleton)
-
       expect(@container).to receive(:register).with(Dandy::Routing::FileReader, :file_reader).and_return(@component)
       expect(@component).to receive(:using_lifetime).with(:singleton)
 
@@ -82,6 +80,9 @@ RSpec.describe Dandy::App do
       expect(@component).to receive(:using_lifetime).with(:singleton)
 
       expect(@container).to receive(:register).with(Dandy::Routing::Parser, :route_parser).and_return(@component)
+      expect(@component).to receive(:using_lifetime).with(:singleton)
+
+      expect(@container).to receive(:register).with(Dandy::SafeExecutor, :safe_executor).and_return(@component)
       expect(@component).to receive(:using_lifetime).with(:singleton)
 
       Dandy::App.new(@container)
@@ -110,7 +111,7 @@ RSpec.describe Dandy::App do
       app = Dandy::App.new(@container)
       app.instance_variable_set('@route_matcher', route_matcher)
 
-      expect(Dandy::Request).to receive(:new).with(route_matcher, @container, @chain_factory, @view_factory).and_return(request)
+      expect(Dandy::Request).to receive(:new).with(route_matcher, @container, @safe_executor).and_return(request)
       expect(request).to receive(:handle).with(env)
       app.call(env)
     end

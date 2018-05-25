@@ -2,7 +2,7 @@ require 'spec_helper'
 require 'dandy/chain'
 
 RSpec.describe Dandy::Chain do
-  describe 'execute' do
+  describe 'run_commands' do
     before :each do
       @dandy_config = {
         action: {
@@ -32,13 +32,6 @@ RSpec.describe Dandy::Chain do
       allow(@command3).to receive(:entity?).and_return(false)
       allow(@container).to receive(:resolve).with(:command3).and_return(@command3)
 
-      @catch_command = double(:catch_command)
-      allow(@catch_command).to receive(:name).and_return('handle_errors')
-      allow(@catch_command).to receive(:call)
-      allow(@container).to receive(:resolve).with(:handle_errors).and_return(@catch_command)
-
-
-      allow(@container).to receive(:resolve).with('catch').and_return(@catch_command)
       @commands = [@command1, @command2, @command3]
 
       component1 = double(:component1)
@@ -56,7 +49,12 @@ RSpec.describe Dandy::Chain do
       allow(@container).to receive(:register_instance).with('command3 result', :command3_result)
                              .and_return(component3)
 
-      @chain = Dandy::Chain.new(@container, @dandy_config, @commands, @command3, @catch_command)
+      @headers = {
+        'Accept': 'application/json',
+        'Keys-Format': 'camel'
+      }
+
+      @chain = Dandy::Chain.new(@container, @dandy_config)
     end
 
     context '-> command1 -> command2 -> command3 :catch' do
@@ -71,7 +69,7 @@ RSpec.describe Dandy::Chain do
         expect(@command2).to receive(:call).ordered
         expect(@command3).to receive(:call).ordered
 
-        @chain.execute
+        @chain.run_commands(@commands, @command3)
       end
 
       it 'returns last command result' do
@@ -83,37 +81,8 @@ RSpec.describe Dandy::Chain do
         allow(@command2).to receive(:call).and_return(result2)
         allow(@command3).to receive(:call).and_return(result3)
 
-        expect(@chain.execute).to eql(result3)
+        expect(@chain.run_commands(@commands, @command3)).to eql(result3)
       end
-
-      context 'when command1 raises exception' do
-        before :each do
-          @error = StandardError.new
-          allow(@command1).to receive(:call).and_raise(@error)
-
-          error_command = double(:error_command)
-          allow(error_command).to receive_message_chain('using_lifetime.bound_to')
-          allow(@container).to receive(:register_instance).with(@error, :dandy_error)
-                                 .and_return(error_command)
-        end
-
-        it 'catch action should be called' do
-          expect(@catch_command).to receive(:call)
-          @chain.execute
-        end
-
-        it 'further commands should not be executed' do
-          expect(@command2).not_to receive(:call)
-          expect(@command3).not_to receive(:call)
-          @chain.execute
-        end
-
-        it 'dandy_error should be registered in container' do
-          expect(@container).to receive(:register_instance).with(@error, :dandy_error)
-          @chain.execute
-        end
-      end
-
     end
 
     context '=> command1 => command2 -> command3 :catch' do
@@ -143,38 +112,8 @@ RSpec.describe Dandy::Chain do
       end
 
       it 'commands should be executed in correct order (parallel commands should be completed before the next sequential)' do
-        @chain.execute
+        @chain.run_commands(@commands, @command3)
         expect(@order).to eql([2, 1, 3])
-      end
-
-      context 'when first raises exception' do
-        before :each do
-          @error = StandardError.new
-          allow(@command1).to receive(:call) do
-            sleep(0.2)
-            raise @error
-          end
-
-          error_command = double(:error_command)
-          allow(error_command).to receive_message_chain('using_lifetime.bound_to')
-          allow(@container).to receive(:register_instance).with(@error, :dandy_error)
-                                 .and_return(error_command)
-        end
-
-        it 'catch action should be called' do
-          expect(@catch_command).to receive(:call)
-          @chain.execute
-        end
-
-        it 'further sequential commands should not be executed' do
-          expect(@command3).not_to receive(:call)
-          @chain.execute
-        end
-
-        it 'dandy_error should be registered in container' do
-          expect(@container).to receive(:register_instance).with(@error, :dandy_error)
-          @chain.execute
-        end
       end
     end
 
@@ -195,7 +134,7 @@ RSpec.describe Dandy::Chain do
         expect(@command2).to receive(:call)
         expect(@command3).to receive(:call)
 
-        @chain.execute
+        @chain.run_commands(@commands, @command3)
       end
     end
 
@@ -226,7 +165,7 @@ RSpec.describe Dandy::Chain do
       end
 
       it 'async commands may not be completed before the next sequential' do
-        @chain.execute
+        @chain.run_commands(@commands, @command3)
         expect(@order).to eql([3])
         sleep(0.2) # wait until rspec doubles released
       end
@@ -261,30 +200,9 @@ RSpec.describe Dandy::Chain do
       end
 
       it 'async commands may not be completed on chain completed' do
-        @chain.execute
+        @chain.run_commands(@commands, @command3)
         expect(@order).to eql([])
         sleep(0.2) # wait until rspec doubles released
-      end
-    end
-
-    context 'when catch command is not defined' do
-      before :each do
-        @chain = Dandy::Chain.new(@container, @dandy_config, @commands, @command3)
-      end
-
-      context 'and a chain command raises an error' do
-        before :each do
-          @error = StandardError.new
-          allow(@command1).to receive(:sequential?).and_return(true)
-          allow(@command2).to receive(:sequential?).and_return(true)
-          allow(@command3).to receive(:sequential?).and_return(true)
-
-          allow(@command1).to receive(:call).and_raise(@error)
-        end
-
-        it 'throws the error up' do
-          expect {@chain.execute}.to raise_error(@error)
-        end
       end
     end
 
@@ -302,7 +220,7 @@ RSpec.describe Dandy::Chain do
       end
 
       it 'result from last command from main chain should be returned (ignore :after)' do
-        expect(@chain.execute).to eql('command3 result')
+        expect(@chain.run_commands(@commands, @command3)).to eql('command3 result')
       end
     end
 
@@ -323,8 +241,7 @@ RSpec.describe Dandy::Chain do
         allow(@command2).to receive(:entity_name).and_return('user')
         allow(@command2).to receive(:entity_method).and_return('like')
 
-        @chain = Dandy::Chain.new(@container, @dandy_config, [@command2], @command2, @catch_command)
-
+        @chain = Dandy::Chain.new(@container, @dandy_config)
       end
 
       it 'calls entity method' do
@@ -338,7 +255,7 @@ RSpec.describe Dandy::Chain do
                                .and_return(result_component)
 
 
-        @chain.execute
+        @chain.run_commands([@command2], @command2)
       end
     end
   end

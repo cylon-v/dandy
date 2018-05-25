@@ -1,21 +1,19 @@
 require 'json'
-require 'rack/multipart'
-require 'dandy/extensions/hash'
-require 'dandy/chain_factory'
-require 'dandy/view_factory'
 require 'awrence'
 require 'plissken'
-
+require 'rack/multipart'
+require 'dandy/extensions/hash'
+require 'dandy/view_factory'
+require 'dandy/chain'
 
 module Dandy
   class Request
     include Hypo::Scope
 
-    def initialize(route_matcher, container, chain_factory, view_factory)
+    def initialize(route_matcher, container, safe_executor)
       @container = container
       @route_matcher = route_matcher
-      @chain_factory = chain_factory
-      @view_factory = view_factory
+      @safe_executor = safe_executor
     end
 
     def handle(rack_env)
@@ -31,36 +29,26 @@ module Dandy
            .collect {|k, v| [k.split('_').collect(&:capitalize).join('-'), v]}
            .flatten
       ]
-      register_params(headers, :dandy_headers)
+
+      register_context(headers, :dandy_headers)
 
       if match.nil?
         result = [404, {'Content-Type' => headers['Accept']}, []]
       else
+        status = match.route.http_status || default_http_status(match.route.http_verb)
+        register_params(match.params)
+        register_status(status)
+
         query = Rack::Utils.parse_nested_query(rack_env['QUERY_STRING']).to_snake_keys.symbolize_keys
-        register_params(query, :dandy_query)
+        register_context(query, :dandy_query)
 
         data = rack_env['rack.parser.result'] ? rack_env['rack.parser.result'].to_snake_keys.deep_symbolize_keys! : {}
-        register_params(data, :dandy_data)
+        register_context(data, :dandy_data)
 
         multipart = Rack::Multipart.parse_multipart(rack_env) || {}
-        register_params(multipart.values, :dandy_files)
+        register_context(multipart.values, :dandy_files)
 
-        chain = @chain_factory.create(match)
-        chain_result = chain.execute
-
-        if match.route.view
-          body = @view_factory.create(match.route.view, headers['Accept'], {keys_format: headers['Keys-Format'] || 'snake'})
-        else
-          if chain_result.is_a?(String)
-            body = chain_result
-          else # generate JSON when nothing other is requested
-            if headers['Keys-Format'] == 'camel' && chain_result
-              chain_result = chain_result.to_camelback_keys
-            end
-
-            body = JSON.generate(chain_result)
-          end
-        end
+        body = @safe_executor.execute(match.route, headers)
 
         status = @container.resolve(:dandy_status)
         result = [status, {'Content-Type' => headers['Accept']}, [body]]
@@ -80,12 +68,32 @@ module Dandy
         .bound_to(self)
     end
 
-    def register_params(params, name)
+    def register_context(params, name)
       unless params.nil?
         @container.register_instance(params, name)
           .using_lifetime(:scope)
           .bound_to(:dandy_request)
       end
+    end
+
+    def register_params(params)
+      params.keys.each do |key|
+        @container
+          .register_instance(params[key], key.to_sym)
+          .using_lifetime(:scope)
+          .bound_to(:dandy_request)
+      end
+    end
+
+    def register_status(status)
+      @container
+        .register_instance(status, :dandy_status)
+        .using_lifetime(:scope)
+        .bound_to(:dandy_request)
+    end
+
+    def default_http_status(http_verb)
+      http_verb == 'POST' ? 201 : 200
     end
   end
 end
