@@ -2,7 +2,7 @@
 
 Dandy is a minimalistic web API framework. Its main idea is to implement an approach 
 from Clean Architecture principles - "web is just a delivery mechanism". 
-Dandy is build on top of IoC container Hypo and forces to use dependency injection 
+Dandy is build on top of IoC container [Hypo](https://github.com/cylon-v/hypo) and forces to use dependency injection 
 approach everywhere.  
 
 ## Basic Concepts
