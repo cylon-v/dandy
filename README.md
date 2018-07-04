@@ -109,13 +109,14 @@ or just
     $ rackup -p 8000 config.ru
 ```
 
-4. Using a browser, go to http://localhost:8000 and you'll see: 
+4. Run curl command `curl http://localhost:9292 -H "Accept: application/json"` and you'll see: 
 
 ```json
   {"message": "Welcome to dandy-app!"}
 ```
+Please take attention - HTTP header "Accept: application/json" is a mandatory.
 
-5. Investigate example application code, it will explain most of Dandy aspects.
+5. Investigate example application code, it explains most of Dandy aspects.
 6. For more details visit our [Wiki](https://github.com/cylon-v/dandy/wiki).
 
 ## Development
