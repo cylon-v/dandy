@@ -51,7 +51,9 @@ module Dandy
         body = @safe_executor.execute(match.route, headers)
 
         status = @container.resolve(:dandy_status)
-        result = [status, {'Content-Type' => headers['Accept']}, [body]]
+
+        # TODO: Implement more view builders and correctly handle other types
+        result = [status, {'Content-Type' => 'application/json'}, [body]]
       end
 
       release
