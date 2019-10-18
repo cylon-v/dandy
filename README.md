@@ -109,7 +109,7 @@ or just
     $ rackup -p 8000 config.ru
 ```
 
-4. Run curl command `curl http://localhost:9292 -H "Accept: application/json"` and you'll see: 
+4. Run curl command `curl http://localhost:8000 -H "Accept: application/json"` and you'll see: 
 
 ```json
   {"message": "Welcome to dandy-app!"}
