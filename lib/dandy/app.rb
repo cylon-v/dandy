@@ -46,7 +46,8 @@ module Dandy
     def register_dependencies
       instances = {
         config_file_path: 'dandy.yml',
-        dandy_env: ENV['DANDY_ENV'] || 'development'
+        dandy_env: ENV['DANDY_ENV'] || 'development',
+        env: ENV
       }
 
       instances.keys.each do |name|

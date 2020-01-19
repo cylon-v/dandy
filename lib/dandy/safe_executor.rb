@@ -1,3 +1,5 @@
+require 'dandy/response'
+
 module Dandy
   class SafeExecutor
     def initialize(container, dandy_config, view_factory)
@@ -15,27 +17,23 @@ module Dandy
           result = @view_factory.create(route.view, headers['Accept'], {keys_format: headers['Keys-Format'] || 'snake'})
         end
 
-        body = result.is_a?(String) ? result : format_response(result, headers)
+        body = result.is_a?(String) ? result : Response.format(result, headers)
       rescue Exception => error
-        @container
-          .register_instance(error, :dandy_error)
-          .using_lifetime(:scope)
-          .bound_to(:dandy_request)
-
-        action = @container.resolve(route.catch.name.to_sym)
-        body = format_response(action.call, headers)
+        p error
+        body = handle_error(route, headers, error)
       end
 
       body
     end
 
-    private
-    def format_response(result, headers)
-      if headers['Keys-Format'] == 'camel' && result
-        result = result.to_camelback_keys
-      end
+    def handle_error(route, headers, error)
+      @container
+        .register_instance(error, :dandy_error)
+        .using_lifetime(:scope)
+        .bound_to(:dandy_request)
 
-      JSON.generate(result)
+      action = @container.resolve(route.catch.name.to_sym)
+      Response.format(action.call, headers)
     end
   end
 end

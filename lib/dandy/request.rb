@@ -34,6 +34,7 @@ module Dandy
 
       if match.nil?
         result = [404, {'Content-Type' => headers['Accept']}, []]
+        release
       else
         status = match.route.http_status || default_http_status(match.route.http_verb)
         register_params(match.params)
@@ -50,13 +51,16 @@ module Dandy
 
         body = @safe_executor.execute(match.route, headers)
 
-        status = @container.resolve(:dandy_status)
+        begin
+          release
+        rescue Exception => error
+          body = @safe_executor.handle_error(match.route, headers, error)
+        end
 
-        # TODO: Implement more view builders and correctly handle other types
+        status = @container.resolve(:dandy_status)
         result = [status, {'Content-Type' => 'application/json'}, [body]]
       end
 
-      release
 
       result
     end
