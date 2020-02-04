@@ -3,29 +3,41 @@ require 'dandy/view_factory'
 
 RSpec.describe Dandy::ViewFactory do
   describe 'create' do
-    it 'creates a view' do
-      name = 'view_name'
-      content_type = 'application/json'
+    let(:builder) { double(:builder) }
+    let(:container) { double(:container) }
+    let(:template) { double(:template) }
+    let(:view) { double(:view) }
+    let(:template_registry) { double(:template_registry) }
+    let(:view_builder_registry) { double(:view_builder_registry) }
+    let(:view_name) { 'view_name' }
 
-      container = double(:container)
-      template = double(:template)
-
-      view = double(:view)
+    before :each do
       allow(view).to receive(:process)
-
-      builder = double(:builder)
+      allow(template_registry).to receive(:get).with(view_name, 'json').and_return(template)
       allow(builder).to receive(:new).with(template, container, {}).and_return(view)
-
-      template_registry = double(:template_registry)
-      allow(template_registry).to receive(:get).with(name, 'json').and_return(template)
-
-      view_builder_registry = double(:view_builder_registry)
       allow(view_builder_registry).to receive(:get).with('json').and_return(builder)
+    end
 
-      view_factory = Dandy::ViewFactory.new(container, template_registry, view_builder_registry)
+    context 'when builder is defined' do
+      it 'creates a view using ' do
+        view_factory = Dandy::ViewFactory.new(container, template_registry, view_builder_registry)
+        expect(view).to receive(:process)
+        view_factory.create(view_name,  'application/json')
+      end
+    end
 
-      expect(view).to receive(:process)
-      view_factory.create(name,  'application/json')
+    context 'when builder for the content-type is not defined' do
+      before :each do
+        allow(builder).to receive(:new).with(template, container, {}).and_return(view)
+        allow(view_builder_registry).to receive(:get).with('html').and_return(nil)
+        allow(view_builder_registry).to receive(:get).with('json').and_return(builder)
+      end
+
+      it 'creates a view using json builder' do
+        view_factory = Dandy::ViewFactory.new(container, template_registry, view_builder_registry)
+        expect(view).to receive(:process)
+        view_factory.create(view_name,  'text/html')
+      end
     end
   end
 end

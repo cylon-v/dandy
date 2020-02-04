@@ -188,6 +188,18 @@ RSpec.describe Dandy::Request do
         allow(@safe_executor).to receive(:execute).and_return(@body)
         expect(@request.handle(@rack_env)).to eql([@status, {'Content-Type' => 'application/json'}, [@body]])
       end
+
+      context 'when error raised on the scope releasing' do
+        let (:error) { StandardError.new('Error')}
+        before :each do
+          allow(@request).to receive(:release).and_raise error
+        end
+
+        it 'pass error handling to safe_executor' do
+          expect(@safe_executor).to receive(:handle_error).with(@route, @expected_headers, error)
+          @request.handle(@rack_env)
+        end
+      end
     end
   end
 end
