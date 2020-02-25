@@ -9,8 +9,8 @@ module Dandy
       @directories.each do |directory|
         dir = File.join(directory, '**/*')
         files = Dir.glob(dir).reject {|file_path| File.directory?(file_path)}
-
-        files.each do |file|
+        test_patterns = %w(_spec.rb .spec.rb _test.rb .test.rb)
+        files.select {|f| !f.end_with?(*test_patterns)}.each do |file|
           path = File.join(Dir.pwd, file)
           require path
           file_name = File.basename(file).gsub(File.extname(file), '')
