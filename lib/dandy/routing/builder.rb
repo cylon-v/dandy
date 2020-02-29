@@ -10,10 +10,9 @@ module Dandy
         @prev_route = nil
       end
 
-      def build(sections)
+      def build(node)
         result = []
 
-        node = sections.node
         restore_hierarchy(node, nil, node.to_hash)
 
         @route_params.each do |route|
@@ -25,7 +24,7 @@ module Dandy
                 http_verb: action[:http_verb],
                 view: action[:view],
                 http_status: action[:http_status],
-                catch: sections.catch.command,
+                catch: dandy.requests.catch.command,
                 last_command: action[:commands].last,
                 commands: restore_callbacks(route, :before) + action[:commands] + restore_callbacks(route, :after)
               })

@@ -20,11 +20,17 @@ require_relative 'syntax/route'
 require_relative 'syntax/respond'
 
 
-require_relative 'syntax/sections'
+require_relative 'syntax/requests'
 require_relative 'syntax/before_section'
 require_relative 'syntax/tree_section'
 require_relative 'syntax/after_section'
 require_relative 'syntax/catch_section'
+
+require_relative 'syntax/message_name'
+require_relative 'syntax/message'
+require_relative 'syntax/messages'
+
+require_relative 'syntax/dandy'
 
 module Syntax
 end

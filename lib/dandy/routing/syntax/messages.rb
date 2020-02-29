@@ -1,10 +1,10 @@
 module Syntax
-  class Sections < Treetop::Runtime::SyntaxNode
-    attr_reader :node, :catch
+  class Messages < Treetop::Runtime::SyntaxNode
+    attr_reader :messages, :catch
 
     def parse
       elements.each do |element|
-        if element.is_a? Node
+        if element.is_a? Message
           @node = element.parse
         end
 

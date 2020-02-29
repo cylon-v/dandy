@@ -18,7 +18,12 @@ module Dandy
           raise Dandy::SyntaxError, error_message
         end
 
-        @routes_builder.build(tree.parse)
+        dandy = tree.parse
+
+        if dandy.requests
+          node = dandy.requests.node
+          @routes_builder.build(node)
+        end
       end
     end
   end

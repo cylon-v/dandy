@@ -1,4 +1,4 @@
-:receive
+:request
     .->
         :before -> escape_params
         :after -> add_headers
@@ -37,4 +37,8 @@
                         $comment_id ->
                             GET -> show_comment -> :respond <- comment
                             DELETE -> remove_comment
+:catch -> handle_errors
+
+:message
+  "comment.add" -> add_comment
 :catch -> handle_errors
