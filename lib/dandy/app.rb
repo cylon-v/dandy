@@ -11,7 +11,7 @@ require 'dandy/view_builder_registry'
 require 'dandy/view_factory'
 require 'dandy/view_builders/json'
 require 'dandy/routing/routing'
-require 'dandy/safe_executor'
+require 'dandy/route_executor'
 
 module Dandy
   class App
@@ -22,12 +22,12 @@ module Dandy
 
       register_dependencies
       load_basic_dependencies
-      parse_routes
+      parse_entrypoints
       add_view_builders
     end
 
     def call(env)
-      request = Request.new(@route_matcher, @container, @safe_executor)
+      request = Request.new(@route_matcher, @container, @route_executor)
       request.handle(env)
     end
 
@@ -68,7 +68,7 @@ module Dandy
         routes_builder: Routing::RoutesBuilder,
         handlers_builder: Routing::HandlersBuilder,
         dandy_parser: Routing::Parser,
-        safe_executor: SafeExecutor
+        route_executor: RouteExecutor
       }
 
       singletons.keys.each do |name|
@@ -83,13 +83,15 @@ module Dandy
       @dependency_loader = @container.resolve(:dependency_loader)
       @view_builder_registry = @container.resolve(:view_builder_registry)
       @dandy_parser = @container.resolve(:dandy_parser)
-      @safe_executor = @container.resolve(:safe_executor)
+      @route_executor = @container.resolve(:route_executor)
 
       @dependency_loader.load_components
     end
 
     def parse_entrypoints
-      entrypoints = @route_parser.parse
+      entrypoints = @dandy_parser.parse
+
+      p entrypoints
       @routes = entrypoints[:routes]
       @message_handlers = entrypoints[:message_handlers]
       @route_matcher = Routing::Matcher.new(@routes)

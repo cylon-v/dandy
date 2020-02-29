@@ -40,5 +40,8 @@
 :catch -> handle_errors
 
 :message
+    :before -> load_config
+    :after -> close_connections
+
     "comment.add" -> add_comment
 :catch -> handle_errors

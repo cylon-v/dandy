@@ -8,7 +8,7 @@ grammar Syntax
   end
 
   rule messages
-    ':message' eol message+ catch <Messages>
+    ':message' eol before after message+ catch <Messages>
   end
 
   rule message

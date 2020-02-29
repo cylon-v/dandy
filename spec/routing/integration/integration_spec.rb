@@ -1,7 +1,7 @@
 require 'dandy/routing/routing'
 require 'dandy/config'
 
-RSpec.describe '[Integration] Syntax Parsing', :focus do
+RSpec.describe '[Integration] Syntax Parsing' do
   subject do
     syntax_parser = SyntaxParser.new
     routes_builder = Dandy::Routing::RoutesBuilder.new

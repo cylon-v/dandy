@@ -1,7 +1,7 @@
 require 'dandy/response'
 
 module Dandy
-  class SafeExecutor
+  class RouteExecutor
     def initialize(container, dandy_config, view_factory)
       @container = container
       @dandy_config = dandy_config
@@ -26,6 +26,7 @@ module Dandy
       body
     end
 
+    private
     def handle_error(route, headers, error)
       @container
         .register_instance(error, :dandy_error)
