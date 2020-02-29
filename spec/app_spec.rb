@@ -76,7 +76,7 @@ RSpec.describe Dandy::App do
       expect(@container).to receive(:register).with(Dandy::Routing::SyntaxErrorInterpreter, :syntax_error_interpreter).and_return(@component)
       expect(@component).to receive(:using_lifetime).with(:singleton)
 
-      expect(@container).to receive(:register).with(Dandy::Routing::Builder, :routes_builder).and_return(@component)
+      expect(@container).to receive(:register).with(Dandy::Routing::RoutesBuilder, :routes_builder).and_return(@component)
       expect(@component).to receive(:using_lifetime).with(:singleton)
 
       expect(@container).to receive(:register).with(Dandy::Routing::Parser, :route_parser).and_return(@component)

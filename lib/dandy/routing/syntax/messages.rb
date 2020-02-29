@@ -3,9 +3,18 @@ module Syntax
     attr_reader :messages, :catch
 
     def parse
+      @messages ||= []
       elements.each do |element|
+        if element.is_a? BeforeSection
+          @before_commands = element.parse.commands
+        end
+
+        if element.is_a? AfterSection
+          @after_commands = element.parse.commands
+        end
+
         if element.is_a? Message
-          @node = element.parse
+          @messages << element.parse
         end
 
         if element.is_a? CatchSection

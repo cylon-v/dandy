@@ -21,9 +21,15 @@ module Dandy
         dandy = tree.parse
 
         if dandy.requests
-          node = dandy.requests.node
-          @routes_builder.build(node)
+          routes = @routes_builder.build(dandy.requests)
         end
+
+        if dandy.messages
+          node = dandy.requests.node
+          handlers = @routes_builder.build(node)
+        end
+
+
       end
     end
   end

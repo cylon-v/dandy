@@ -4,7 +4,7 @@ require 'dandy/config'
 RSpec.describe '[Integration] Syntax Parsing', :focus do
   subject do
     syntax_parser = SyntaxParser.new
-    routes_builder = Dandy::Routing::Builder.new
+    routes_builder = Dandy::Routing::RoutesBuilder.new
     config = Dandy::Config.new(@config_path)
     file_reader = Dandy::Routing::FileReader.new(config)
 
