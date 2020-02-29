@@ -1,21 +1,17 @@
 module Syntax
   class Message < Treetop::Runtime::SyntaxNode
-    attr_accessor :route, :actions, :my_nodes, :parent_node, :level, :before_commands, :after_commands
+    attr_accessor :name, :commands, :before_commands, :after_commands
 
     def parse(parent_node = nil)
       @parent_node = parent_node
 
       elements.each do |element|
-        if element.is_a? Indent
-          @level = element.elements.length
-        end
-
         if element.is_a? MessageName
-          @route = element.parse(self)
+          @name = element.parse
         end
 
         if element.is_a? Commands
-          @actions = element.parse(self)
+          @commands = element.parse
         end
 
         if element.is_a? BeforeSection
@@ -26,15 +22,12 @@ module Syntax
           @after_commands = element.parse.commands
         end
       end
-
-      self
     end
 
     def to_hash
       {
-        route: @route.to_hash,
-        actions: @actions,
-        level: @level,
+        name: @name,
+        commands: @commands,
         before: @before_commands,
         after: @after_commands
       }

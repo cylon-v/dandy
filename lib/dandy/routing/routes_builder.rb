@@ -13,6 +13,7 @@ module Dandy
       def build(requests)
         result = []
 
+        node = requests.node
         restore_hierarchy(node, nil, node.to_hash)
 
         @route_params.each do |route|

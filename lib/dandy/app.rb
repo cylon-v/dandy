@@ -66,6 +66,7 @@ module Dandy
         syntax_parser: SyntaxParser,
         syntax_error_interpreter: Routing::SyntaxErrorInterpreter,
         routes_builder: Routing::RoutesBuilder,
+        handlers_builder: Routing::HandlersBuilder,
         route_parser: Routing::Parser,
         safe_executor: SafeExecutor
       }

@@ -40,5 +40,5 @@
 :catch -> handle_errors
 
 :message
-  "comment.add" -> add_comment
+    "comment.add" -> add_comment
 :catch -> handle_errors

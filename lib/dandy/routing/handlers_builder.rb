@@ -10,12 +10,13 @@ module Dandy
         @prev_route = nil
       end
 
-      def build(messages)
-        messages.map do |message|
+      def build(section)
+        p section
+        section.messages.map do |message|
           MessageHandler.new({
             catch: messages.catch.command,
             last_command: message[:commands].last,
-            commands: messages[:before] + message[:commands] + messages[:after]
+            commands: messages.before_commands + message[:commands] + messages.after_commands
           })
         end
       end

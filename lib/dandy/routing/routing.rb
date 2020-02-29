@@ -1,5 +1,6 @@
 require 'treetop'
-require 'dandy/routing/builder'
+require 'dandy/routing/routes_builder'
+require 'dandy/routing/handlers_builder'
 require 'dandy/routing/parser'
 require 'dandy/routing/matcher'
 require 'dandy/routing/file_reader'

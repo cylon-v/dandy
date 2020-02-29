@@ -1,10 +1,11 @@
 module Dandy
   module Routing
     class Parser
-      def initialize(file_reader, routes_builder,
+      def initialize(file_reader, routes_builder, handlers_builder,
                      syntax_parser, syntax_error_interpreter)
         @file_reader = file_reader
         @routes_builder = routes_builder
+        @handlers_builder = handlers_builder
         @syntax_parser = syntax_parser
         @syntax_error_interpreter = syntax_error_interpreter
       end
@@ -25,11 +26,12 @@ module Dandy
         end
 
         if dandy.messages
-          node = dandy.requests.node
-          handlers = @routes_builder.build(node)
+          handlers = @handlers_builder.build(dandy.messages)
+
+          p handlers
         end
 
-
+        routes
       end
     end
   end
