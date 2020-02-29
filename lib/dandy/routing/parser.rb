@@ -21,17 +21,16 @@ module Dandy
 
         dandy = tree.parse
 
+        result = {}
         if dandy.requests
-          routes = @routes_builder.build(dandy.requests)
+          result[:routes] = @routes_builder.build(dandy.requests)
         end
 
         if dandy.messages
-          handlers = @handlers_builder.build(dandy.messages)
-
-          p handlers
+          result[:message_handlers] = @handlers_builder.build(dandy.messages)
         end
 
-        routes
+        result
       end
     end
   end

@@ -1,36 +1,19 @@
 module Syntax
   class Message < Treetop::Runtime::SyntaxNode
-    attr_accessor :name, :commands, :before_commands, :after_commands
+    attr_accessor :name, :command_list
 
-    def parse(parent_node = nil)
-      @parent_node = parent_node
-
+    def parse
       elements.each do |element|
         if element.is_a? MessageName
           @name = element.parse
         end
 
         if element.is_a? Commands
-          @commands = element.parse
-        end
-
-        if element.is_a? BeforeSection
-          @before_commands = element.parse.commands
-        end
-
-        if element.is_a? AfterSection
-          @after_commands = element.parse.commands
+          @command_list = element.parse.map(&:name)
         end
       end
-    end
 
-    def to_hash
-      {
-        name: @name,
-        commands: @commands,
-        before: @before_commands,
-        after: @after_commands
-      }
+      self
     end
   end
 end

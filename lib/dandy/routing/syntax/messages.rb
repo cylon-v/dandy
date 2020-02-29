@@ -4,10 +4,15 @@ module Syntax
 
     def parse
       @messages ||= []
+      @before_commands = []
+      @after_commands = []
+
       elements.each do |element|
-        element.elements do |nested|
-          if nested.is_a? Message
-            @messages << nested.parse
+        if element.elements
+          element.elements.each do |nested|
+            if nested.is_a? Message
+              @messages << nested.parse
+            end
           end
         end
 

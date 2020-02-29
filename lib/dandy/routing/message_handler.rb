@@ -5,9 +5,7 @@ module Dandy
         :commands, :last_command
 
       def initialize(hash)
-        @http_verb = hash[:http_verb]
-
-        @params = hash[:params]
+        @name = hash[:name]
         @commands = hash[:commands]
         @last_command = hash[:last_command]
         @catch = hash[:catch]

@@ -67,7 +67,7 @@ module Dandy
         syntax_error_interpreter: Routing::SyntaxErrorInterpreter,
         routes_builder: Routing::RoutesBuilder,
         handlers_builder: Routing::HandlersBuilder,
-        route_parser: Routing::Parser,
+        dandy_parser: Routing::Parser,
         safe_executor: SafeExecutor
       }
 
@@ -82,14 +82,16 @@ module Dandy
       @view_factory = @container.resolve(:view_factory)
       @dependency_loader = @container.resolve(:dependency_loader)
       @view_builder_registry = @container.resolve(:view_builder_registry)
-      @route_parser = @container.resolve(:route_parser)
+      @dandy_parser = @container.resolve(:dandy_parser)
       @safe_executor = @container.resolve(:safe_executor)
 
       @dependency_loader.load_components
     end
 
-    def parse_routes
-      @routes = @route_parser.parse
+    def parse_entrypoints
+      entrypoints = @route_parser.parse
+      @routes = entrypoints[:routes]
+      @message_handlers = entrypoints[:message_handlers]
       @route_matcher = Routing::Matcher.new(@routes)
     end
   end

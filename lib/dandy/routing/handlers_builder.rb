@@ -11,12 +11,12 @@ module Dandy
       end
 
       def build(section)
-        p section
         section.messages.map do |message|
           MessageHandler.new({
-            catch: messages.catch.command,
-            last_command: message[:commands].last,
-            commands: messages.before_commands + message[:commands] + messages.after_commands
+            name: message.name,
+            catch: section.catch.command,
+            last_command: message.command_list.last,
+            commands: section.before_commands + message.command_list + section.after_commands
           })
         end
       end
