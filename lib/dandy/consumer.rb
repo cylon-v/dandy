@@ -4,7 +4,7 @@ module Dandy
       @message_handlers = {}
       @handler_executor = handler_executor
       message_handlers.each do |handler|
-        @message_handlers[message_handlers.name] = handler
+        @message_handlers[handler.name] = handler
       end
     end
 
