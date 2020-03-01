@@ -18,6 +18,7 @@ RSpec.describe Dandy::App do
   let(:dandy_config) { double(:dandy_config) }
   let(:view_factory) { double(:view_factory) }
   let(:route_executor) { double(:route_executor) }
+  let(:handler_executor) { double(:handler_executor) }
   let(:view_builder_registry) { double(:view_builder_registry) }
   let(:dependency_loader) { double(:dependency_loader) }
   let(:dandy_parser) { double(:dandy_parser) }
@@ -39,6 +40,7 @@ RSpec.describe Dandy::App do
     allow(container).to receive(:resolve).with(:view_builder_registry).and_return(view_builder_registry)
     allow(container).to receive(:resolve).with(:dandy_parser).and_return(dandy_parser)
     allow(container).to receive(:resolve).with(:route_executor).and_return(route_executor)
+    allow(container).to receive(:resolve).with(:handler_executor).and_return(handler_executor)
   end
 
   describe 'initialize' do
@@ -86,6 +88,9 @@ RSpec.describe Dandy::App do
       expect(component).to receive(:using_lifetime).with(:singleton)
 
       expect(container).to receive(:register).with(Dandy::RouteExecutor, :route_executor).and_return(component)
+      expect(component).to receive(:using_lifetime).with(:singleton)
+
+      expect(container).to receive(:register).with(Dandy::HandlerExecutor, :handler_executor).and_return(component)
       expect(component).to receive(:using_lifetime).with(:singleton)
 
       Dandy::App.new(container)

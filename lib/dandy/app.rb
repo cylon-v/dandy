@@ -12,6 +12,7 @@ require 'dandy/view_factory'
 require 'dandy/view_builders/json'
 require 'dandy/routing/routing'
 require 'dandy/route_executor'
+require 'dandy/handler_executor'
 
 module Dandy
   class App
@@ -35,6 +36,10 @@ module Dandy
 
     def add_view_builder(view_builder, format)
       @view_builder_registry.add(view_builder, format)
+    end
+
+    def add_consumer(consumer)
+      consumer.connect(@message_handlers, @handler_executor)
     end
 
     private
@@ -68,7 +73,8 @@ module Dandy
         routes_builder: Routing::RoutesBuilder,
         handlers_builder: Routing::HandlersBuilder,
         dandy_parser: Routing::Parser,
-        route_executor: RouteExecutor
+        route_executor: RouteExecutor,
+        handler_executor: HandlerExecutor
       }
 
       singletons.keys.each do |name|
@@ -84,14 +90,13 @@ module Dandy
       @view_builder_registry = @container.resolve(:view_builder_registry)
       @dandy_parser = @container.resolve(:dandy_parser)
       @route_executor = @container.resolve(:route_executor)
+      @handler_executor = @container.resolve(:handler_executor)
 
       @dependency_loader.load_components
     end
 
     def parse_entrypoints
       entrypoints = @dandy_parser.parse
-
-      p entrypoints
       @routes = entrypoints[:routes]
       @message_handlers = entrypoints[:message_handlers]
       @route_matcher = Routing::Matcher.new(@routes)
