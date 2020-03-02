@@ -26,7 +26,6 @@ module Dandy
       body
     end
 
-    private
     def handle_error(route, headers, error)
       @container
         .register_instance(error, :dandy_error)

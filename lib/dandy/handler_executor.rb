@@ -16,7 +16,6 @@ module Dandy
       end
     end
 
-    private
     def handle_error(message_handler, error)
       @container
         .register_instance(error, :dandy_error)
