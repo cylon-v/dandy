@@ -31,7 +31,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ['lib']
 
   spec.add_dependency 'hypo', '~> 1.0.0'
-  spec.add_dependency 'rack', '~> 2.0.3'
+  spec.add_dependency 'rack', '~> 2.2.3'
   spec.add_dependency 'thor', '~> 0.20.0'
   spec.add_dependency 'treetop', '~> 1.6.8'
   spec.add_dependency 'jbuilder', '~> 2.7.0'
@@ -41,7 +41,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'plissken', '~> 1.2.0'
 
   spec.add_development_dependency 'bundler', '~> 2.1'
-  spec.add_development_dependency 'rake', '~> 10.0'
+  spec.add_development_dependency 'rake', '~> 13.0'
   spec.add_development_dependency 'rspec', '~> 3.0'
   spec.add_development_dependency 'rspec-mocks', '~> 3.6'
   spec.add_development_dependency  'simplecov', '~> 0.15'
