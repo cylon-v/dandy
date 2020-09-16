@@ -49,9 +49,8 @@ module Dandy
         multipart = Rack::Multipart.parse_multipart(rack_env) || {}
         register_context(multipart.values, :dandy_files)
 
-        body = @route_executor.execute(match.route, headers)
-
         begin
+          body = @route_executor.execute(match.route, headers)
           release
         rescue Exception => error
           body = @route_executor.handle_error(match.route, headers, error)

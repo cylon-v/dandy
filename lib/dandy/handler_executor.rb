@@ -20,7 +20,7 @@ module Dandy
       @container
         .register_instance(error, :dandy_error)
         .using_lifetime(:scope)
-        .bound_to(:dandy_request)
+        .bound_to(:dandy_message)
 
       command = @container.resolve(message_handler.catch.name.to_sym)
       command.call
