@@ -12,7 +12,7 @@ module Dandy
         chain.run_commands(message_handler.commands, message_handler.last_command)
       rescue Exception => error
         p error
-        handle_error(message_handler, error)
+        # handle_error(message_handler, error)
       end
     end
 

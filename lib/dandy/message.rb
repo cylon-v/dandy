@@ -40,7 +40,7 @@ module Dandy
     end
 
     def register_data(data)
-      unless params.nil?
+      unless data.nil?
         @container.register_instance(data, :dandy_data)
             .using_lifetime(:scope)
             .bound_to(:dandy_request)
