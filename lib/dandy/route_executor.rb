@@ -12,7 +12,7 @@ module Dandy
       chain = Chain.new(@container, @dandy_config)
 
       begin
-        result = chain.run_commands(route.commands, route.last_command)
+        result = chain.run_commands(route.commands, route.last_command, :dandy_request)
         if route.view
           result = @view_factory.create(route.view, headers['Accept'], {keys_format: headers['Keys-Format'] || 'snake'})
         end

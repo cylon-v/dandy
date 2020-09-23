@@ -9,10 +9,9 @@ module Dandy
       chain = Chain.new(@container, @dandy_config)
 
       begin
-        chain.run_commands(message_handler.commands, message_handler.last_command)
+        chain.run_commands(message_handler.commands, message_handler.last_command, :dandy_message)
       rescue Exception => error
-        p error
-        # handle_error(message_handler, error)
+        handle_error(message_handler, error)
       end
     end
 

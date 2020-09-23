@@ -43,7 +43,7 @@ module Dandy
       unless data.nil?
         @container.register_instance(data, :dandy_data)
             .using_lifetime(:scope)
-            .bound_to(:dandy_request)
+            .bound_to(:dandy_message)
       end
     end
   end

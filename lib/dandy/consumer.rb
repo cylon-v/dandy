@@ -22,10 +22,11 @@ module Dandy
     end
 
     def handle(message_name, payload)
-      p message_name, payload
-      handler = @message_handlers[message_name]
-      message = Message.new(@container, handler, @handler_executor)
-      message.handle(payload)
+      if @message_handlers.key? message_name
+        handler = @message_handlers[message_name]
+        message = Message.new(@container, handler, @handler_executor)
+        message.handle(payload)
+      end
     end
   end
 end

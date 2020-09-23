@@ -9,7 +9,7 @@ module Syntax
         end
 
         if element.is_a? Commands
-          @command_list = element.parse.map(&:name)
+          @command_list = element.parse
         end
       end
 

@@ -7,7 +7,7 @@ module Dandy
       @async_timeout = dandy_config[:action][:async_timeout]
     end
 
-    def run_commands(commands, last_command)
+    def run_commands(commands, last_command, scope)
       threads = []
       Thread.abort_on_exception = true
 
@@ -19,17 +19,17 @@ module Dandy
           threads = []
 
           if last_command && (command.name == last_command.name)
-            result = run_command(command)
+            result = run_command(command, scope)
           else
-            run_command(command)
+            run_command(command, scope)
           end
         else
           thread = Thread.new {
             Timeout::timeout(@async_timeout) {
               if last_command && (command.name == last_command.name)
-                result = run_command(command)
+                result = run_command(command, scope)
               else
-                run_command(command)
+                run_command(command, scope)
               end
             }
           }
@@ -47,7 +47,7 @@ module Dandy
 
     private
 
-    def run_command(command)
+    def run_command(command, scope)
       if command.entity?
         entity = @container.resolve(command.entity_name.to_sym)
         method_name = command.entity_method.to_sym
@@ -65,7 +65,7 @@ module Dandy
       @container
         .register_instance(result, command.result_name.to_sym)
         .using_lifetime(:scope)
-        .bound_to(:dandy_request)
+        .bound_to(scope)
 
       result
     end
