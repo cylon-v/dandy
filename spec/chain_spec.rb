@@ -69,7 +69,7 @@ RSpec.describe Dandy::Chain do
         expect(@command2).to receive(:call).ordered
         expect(@command3).to receive(:call).ordered
 
-        @chain.run_commands(@commands, @command3)
+        @chain.run_commands(@commands, @command3, nil)
       end
 
       it 'returns last command result' do
@@ -81,7 +81,7 @@ RSpec.describe Dandy::Chain do
         allow(@command2).to receive(:call).and_return(result2)
         allow(@command3).to receive(:call).and_return(result3)
 
-        expect(@chain.run_commands(@commands, @command3)).to eql(result3)
+        expect(@chain.run_commands(@commands, @command3, nil)).to eql(result3)
       end
     end
 
@@ -112,7 +112,7 @@ RSpec.describe Dandy::Chain do
       end
 
       it 'commands should be executed in correct order (parallel commands should be completed before the next sequential)' do
-        @chain.run_commands(@commands, @command3)
+        @chain.run_commands(@commands, @command3, nil)
         expect(@order).to eql([2, 1, 3])
       end
     end
@@ -134,7 +134,7 @@ RSpec.describe Dandy::Chain do
         expect(@command2).to receive(:call)
         expect(@command3).to receive(:call)
 
-        @chain.run_commands(@commands, @command3)
+        @chain.run_commands(@commands, @command3, nil)
       end
     end
 
@@ -165,7 +165,7 @@ RSpec.describe Dandy::Chain do
       end
 
       it 'async commands may not be completed before the next sequential' do
-        @chain.run_commands(@commands, @command3)
+        @chain.run_commands(@commands, @command3, nil)
         expect(@order).to eql([3])
         sleep(0.2) # wait until rspec doubles released
       end
@@ -200,7 +200,7 @@ RSpec.describe Dandy::Chain do
       end
 
       it 'async commands may not be completed on chain completed' do
-        @chain.run_commands(@commands, @command3)
+        @chain.run_commands(@commands, @command3, nil)
         expect(@order).to eql([])
         sleep(0.2) # wait until rspec doubles released
       end
@@ -220,7 +220,7 @@ RSpec.describe Dandy::Chain do
       end
 
       it 'result from last command from main chain should be returned (ignore :after)' do
-        expect(@chain.run_commands(@commands, @command3)).to eql('command3 result')
+        expect(@chain.run_commands(@commands, @command3, nil)).to eql('command3 result')
       end
     end
 
@@ -255,7 +255,7 @@ RSpec.describe Dandy::Chain do
                                .and_return(result_component)
 
 
-        @chain.run_commands([@command2], @command2)
+        @chain.run_commands([@command2], @command2, nil)
       end
     end
   end
