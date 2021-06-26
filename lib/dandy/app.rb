@@ -11,7 +11,8 @@ require 'dandy/view_builder_registry'
 require 'dandy/view_factory'
 require 'dandy/view_builders/json'
 require 'dandy/routing/routing'
-require 'dandy/safe_executor'
+require 'dandy/route_executor'
+require 'dandy/handler_executor'
 
 module Dandy
   class App
@@ -22,12 +23,12 @@ module Dandy
 
       register_dependencies
       load_basic_dependencies
-      parse_routes
+      parse_entrypoints
       add_view_builders
     end
 
     def call(env)
-      request = Request.new(@route_matcher, @container, @safe_executor)
+      request = Request.new(@route_matcher, @container, @route_executor)
       request.handle(env)
     end
 
@@ -35,6 +36,10 @@ module Dandy
 
     def add_view_builder(view_builder, format)
       @view_builder_registry.add(view_builder, format)
+    end
+
+    def add_consumer(consumer)
+      consumer.connect(@message_handlers, @handler_executor)
     end
 
     private
@@ -65,9 +70,11 @@ module Dandy
         file_reader: Routing::FileReader,
         syntax_parser: SyntaxParser,
         syntax_error_interpreter: Routing::SyntaxErrorInterpreter,
-        routes_builder: Routing::Builder,
-        route_parser: Routing::Parser,
-        safe_executor: SafeExecutor
+        routes_builder: Routing::RoutesBuilder,
+        handlers_builder: Routing::HandlersBuilder,
+        dandy_parser: Routing::Parser,
+        route_executor: RouteExecutor,
+        handler_executor: HandlerExecutor
       }
 
       singletons.keys.each do |name|
@@ -81,14 +88,17 @@ module Dandy
       @view_factory = @container.resolve(:view_factory)
       @dependency_loader = @container.resolve(:dependency_loader)
       @view_builder_registry = @container.resolve(:view_builder_registry)
-      @route_parser = @container.resolve(:route_parser)
-      @safe_executor = @container.resolve(:safe_executor)
+      @dandy_parser = @container.resolve(:dandy_parser)
+      @route_executor = @container.resolve(:route_executor)
+      @handler_executor = @container.resolve(:handler_executor)
 
       @dependency_loader.load_components
     end
 
-    def parse_routes
-      @routes = @route_parser.parse
+    def parse_entrypoints
+      entrypoints = @dandy_parser.parse
+      @routes = entrypoints[:routes]
+      @message_handlers = entrypoints[:message_handlers]
       @route_matcher = Routing::Matcher.new(@routes)
     end
   end

@@ -10,10 +10,10 @@ module Dandy
   class Request
     include Hypo::Scope
 
-    def initialize(route_matcher, container, safe_executor)
+    def initialize(route_matcher, container, route_executor)
       @container = container
       @route_matcher = route_matcher
-      @safe_executor = safe_executor
+      @route_executor = route_executor
     end
 
     def handle(rack_env)
@@ -49,12 +49,11 @@ module Dandy
         multipart = Rack::Multipart.parse_multipart(rack_env) || {}
         register_context(multipart.values, :dandy_files)
 
-        body = @safe_executor.execute(match.route, headers)
-
         begin
+          body = @route_executor.execute(match.route, headers)
           release
         rescue Exception => error
-          body = @safe_executor.handle_error(match.route, headers, error)
+          body = @route_executor.handle_error(match.route, headers, error)
         end
 
         status = @container.resolve(:dandy_status)

@@ -1,7 +1,7 @@
 require 'dandy/response'
 
 module Dandy
-  class SafeExecutor
+  class RouteExecutor
     def initialize(container, dandy_config, view_factory)
       @container = container
       @dandy_config = dandy_config
@@ -12,7 +12,7 @@ module Dandy
       chain = Chain.new(@container, @dandy_config)
 
       begin
-        result = chain.run_commands(route.commands, route.last_command)
+        result = chain.run_commands(route.commands, route.last_command, :dandy_request)
         if route.view
           result = @view_factory.create(route.view, headers['Accept'], {keys_format: headers['Keys-Format'] || 'snake'})
         end

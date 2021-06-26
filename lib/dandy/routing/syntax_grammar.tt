@@ -1,6 +1,22 @@
 grammar Syntax
-  rule sections
-    ':receive' eol node catch <Sections>
+  rule dandy
+    (requests) 0..1 (messages) 0..1 <Dandy>
+  end
+
+  rule requests
+    ':request' eol node catch <Requests>
+  end
+
+  rule messages
+    ':message' eol before after message+ catch <Messages>
+  end
+
+  rule message
+    indent message_name commands eol <Message>
+  end
+
+  rule message_name
+    '"' [a-z0-9_\-.]+ '"' <MessageName>
   end
 
   rule before

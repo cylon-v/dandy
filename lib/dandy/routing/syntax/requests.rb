@@ -1,5 +1,5 @@
 module Syntax
-  class Sections < Treetop::Runtime::SyntaxNode
+  class Requests < Treetop::Runtime::SyntaxNode
     attr_reader :node, :catch
 
     def parse

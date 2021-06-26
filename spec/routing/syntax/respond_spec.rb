@@ -1,5 +1,5 @@
 require 'spec_helper'
-require 'dandy/routing/syntax/sections'
+require 'dandy/routing/syntax/requests'
 require 'dandy/routing/syntax/primitives/http_status'
 require 'dandy/routing/syntax/view'
 

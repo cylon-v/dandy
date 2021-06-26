@@ -2,7 +2,7 @@
 
 module Dandy
   module Routing
-    class Builder
+    class RoutesBuilder
       def initialize
         @parsed_items = []
         @route_params = []
@@ -10,10 +10,10 @@ module Dandy
         @prev_route = nil
       end
 
-      def build(sections)
+      def build(requests)
         result = []
 
-        node = sections.node
+        node = requests.node
         restore_hierarchy(node, nil, node.to_hash)
 
         @route_params.each do |route|
@@ -25,7 +25,7 @@ module Dandy
                 http_verb: action[:http_verb],
                 view: action[:view],
                 http_status: action[:http_status],
-                catch: sections.catch.command,
+                catch: requests.catch.command,
                 last_command: action[:commands].last,
                 commands: restore_callbacks(route, :before) + action[:commands] + restore_callbacks(route, :after)
               })

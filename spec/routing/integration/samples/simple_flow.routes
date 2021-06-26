@@ -1,4 +1,4 @@
-:receive
+:request
     .->
         GET -> greeting
 :catch -> handle_errors

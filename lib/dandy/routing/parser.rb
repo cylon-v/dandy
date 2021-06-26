@@ -1,10 +1,11 @@
 module Dandy
   module Routing
     class Parser
-      def initialize(file_reader, routes_builder,
+      def initialize(file_reader, routes_builder, handlers_builder,
                      syntax_parser, syntax_error_interpreter)
         @file_reader = file_reader
         @routes_builder = routes_builder
+        @handlers_builder = handlers_builder
         @syntax_parser = syntax_parser
         @syntax_error_interpreter = syntax_error_interpreter
       end
@@ -18,7 +19,18 @@ module Dandy
           raise Dandy::SyntaxError, error_message
         end
 
-        @routes_builder.build(tree.parse)
+        dandy = tree.parse
+
+        result = {}
+        if dandy.requests
+          result[:routes] = @routes_builder.build(dandy.requests)
+        end
+
+        if dandy.messages
+          result[:message_handlers] = @handlers_builder.build(dandy.messages)
+        end
+
+        result
       end
     end
   end
