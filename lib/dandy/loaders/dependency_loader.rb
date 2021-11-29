@@ -7,7 +7,7 @@ module Dandy
       @dandy_env = dandy_env
     end
 
-    def load_components(scope = :dandy_request)
+    def load_components(scope)
       if @dandy_env == 'development'
         # every time reload types in development mode
         @types = @type_loader.load_types

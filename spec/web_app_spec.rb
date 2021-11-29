@@ -10,9 +10,9 @@ require 'dandy/view_builder_registry'
 require 'dandy/view_factory'
 require 'dandy/view_builders/json'
 require 'dandy/routing/routing'
-require 'dandy/app'
+require 'dandy/web_app'
 
-RSpec.describe Dandy::App do
+RSpec.describe Dandy::WebApp do
   let(:container) { double(:container) }
   let(:component) { double(:component) }
   let(:dandy_config) { double(:dandy_config) }
@@ -84,7 +84,7 @@ RSpec.describe Dandy::App do
       expect(container).to receive(:register).with(Dandy::Routing::HandlersBuilder, :handlers_builder).and_return(component)
       expect(component).to receive(:using_lifetime).with(:singleton)
 
-      expect(container).to receive(:register).with(Dandy::Routing::Parser, :dandy_parser).and_return(component)
+      expect(container).to receive(:register).with(Dandy::Routing::WebParser, :dandy_parser).and_return(component)
       expect(component).to receive(:using_lifetime).with(:singleton)
 
       expect(container).to receive(:register).with(Dandy::RouteExecutor, :route_executor).and_return(component)
@@ -93,7 +93,7 @@ RSpec.describe Dandy::App do
       expect(container).to receive(:register).with(Dandy::HandlerExecutor, :handler_executor).and_return(component)
       expect(component).to receive(:using_lifetime).with(:singleton)
 
-      Dandy::App.new(container)
+      described_class.new(container)
     end
 
     it 'registers default Json view builder' do
@@ -102,7 +102,7 @@ RSpec.describe Dandy::App do
 
       expect(view_builder_registry).to receive(:add).with(Dandy::ViewBuilders::Json, 'json')
 
-      Dandy::App.new(container)
+      described_class.new(container)
     end
   end
 
@@ -116,7 +116,7 @@ RSpec.describe Dandy::App do
       route_matcher = double(:route_matcher)
       env = double(:env)
 
-      app = Dandy::App.new(container)
+      app = described_class.new(container)
       app.instance_variable_set('@route_matcher', route_matcher)
 
       expect(Dandy::Request).to receive(:new).with(route_matcher, container, route_executor).and_return(request)

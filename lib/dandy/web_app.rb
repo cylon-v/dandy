@@ -15,7 +15,7 @@ require 'dandy/route_executor'
 require 'dandy/handler_executor'
 
 module Dandy
-  class App
+  class WebApp
     attr_reader :routes
 
     def initialize(container = Hypo::Container.new)
@@ -36,10 +36,6 @@ module Dandy
 
     def add_view_builder(view_builder, format)
       @view_builder_registry.add(view_builder, format)
-    end
-
-    def add_consumer(consumer)
-      consumer.connect(@message_handlers, @handler_executor)
     end
 
     private
@@ -72,7 +68,7 @@ module Dandy
         syntax_error_interpreter: Routing::SyntaxErrorInterpreter,
         routes_builder: Routing::RoutesBuilder,
         handlers_builder: Routing::HandlersBuilder,
-        dandy_parser: Routing::Parser,
+        dandy_parser: Routing::WebParser,
         route_executor: RouteExecutor,
         handler_executor: HandlerExecutor
       }
@@ -92,7 +88,7 @@ module Dandy
       @route_executor = @container.resolve(:route_executor)
       @handler_executor = @container.resolve(:handler_executor)
 
-      @dependency_loader.load_components
+      @dependency_loader.load_components(:dandy_request)
     end
 
     def parse_entrypoints

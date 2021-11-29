@@ -31,8 +31,8 @@ RSpec.describe Dandy::DependencyLoader do
         expect(@container).to receive(:using_lifetime).with(:scope).twice
         expect(@container).to receive(:bound_to).with(:dandy_request).twice
 
-        dependency_loader = Dandy::DependencyLoader.new(@container, @type_loader, @dandy_env)
-        dependency_loader.load_components
+        dependency_loader = described_class.new(@container, @type_loader, @dandy_env)
+        dependency_loader.load_components(:dandy_request)
       end
     end
 
@@ -45,8 +45,8 @@ RSpec.describe Dandy::DependencyLoader do
         dependency_loader = Dandy::DependencyLoader.new(@container, @type_loader, @dandy_env)
         expect(@type_loader).to receive(:load_types).twice
 
-        dependency_loader.load_components
-        dependency_loader.load_components
+        dependency_loader.load_components(:dandy_request)
+        dependency_loader.load_components(:dandy_request)
       end
     end
 
@@ -60,7 +60,7 @@ RSpec.describe Dandy::DependencyLoader do
         dependency_loader = Dandy::DependencyLoader.new(@container, @type_loader, @dandy_env)
         expect(@type_loader).not_to receive(:load_types)
 
-        dependency_loader.load_components
+        dependency_loader.load_components(:dandy_request)
       end
     end
 
